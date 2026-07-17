@@ -1,0 +1,31 @@
+export const D_DARK = {
+  bg: "#1c1c1e",
+  surface: "#2c2c2e",
+  surface2: "#3c3c3e",
+  surface3: "#48484a",
+  border: "#3c3c3e",
+  text: "#ffffff",
+  textSub: "#d1d1d6",
+  textMuted: "#8e8e93",
+  red: "#e91835",
+  blue: "#0a84ff",
+  green: "#30d158",
+  amber: "#ff9f0a",
+  purple: "#bf5af2",
+}
+
+export const D_LIGHT = {
+  bg: "#f4f4f6",
+  surface: "#ffffff",
+  surface2: "#f9fafb",
+  surface3: "#e5e7eb",
+  border: "#e5e7eb",
+  text: "#111827",
+  textSub: "#374151",
+  textMuted: "#6b7280",
+  red: "#e91835",
+  blue: "#0070e0",
+  green: "#24b04b",
+  amber: "#ff9500",
+  purple: "#af52de",
+}
