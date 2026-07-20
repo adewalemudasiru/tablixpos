@@ -1,0 +1,42 @@
+import { AppLogo } from "../AppSidebar"
+import { NavMenu } from "../NavMenu"
+
+interface TablesHeaderProps {
+  isEmbedded?: boolean
+  isDark?: boolean
+}
+
+export function TablesHeader({
+  isEmbedded = false,
+  isDark = false,
+}: TablesHeaderProps) {
+  return (
+    <header
+      className="z-30 flex h-[69px] shrink-0 items-center justify-between border-b px-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.06)] md:px-6"
+      style={{
+        background: isEmbedded
+          ? isDark
+            ? "#1c1c1e"
+            : "#f4f4f6"
+          : "var(--page-header-bg)",
+        borderColor: isEmbedded
+          ? isDark
+            ? "#3c3c3e"
+            : "#e5e7eb"
+          : "var(--page-header-border)",
+      }}
+    >
+      <div className="flex items-center gap-3">
+        {!isEmbedded && <AppLogo />}
+        {!isEmbedded && <NavMenu />}
+        {isEmbedded && (
+          <h1
+            className={`text-xl font-semibold ${isDark ? "text-white" : "text-[#111827]"}`}
+          >
+            Tables
+          </h1>
+        )}
+      </div>
+    </header>
+  )
+}
