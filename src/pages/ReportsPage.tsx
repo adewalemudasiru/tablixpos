@@ -19,7 +19,7 @@ import { PrepQualityChart } from "@/components/reports-page/PrepQualityChart"
 import { ReportsHeader } from "../components/reports-page/ReportsHeader"
 import { ReportsFilters } from "../components/reports-page/ReportsFilters"
 import { RecentOrdersTable } from "../components/reports-page/RecentOrdersTable"
-import { KitchenPerformanceTable } from "../components/reports-page/KItchenPerformanceTable"
+import { KitchenPerformanceTable } from "../components/reports-page/KitchenPerformanceTable"
 import { ReportsLoadingSkeleton } from "../components/reports-page/ReportsLoadingSkeleton"
 import { useReportsData } from "../hooks/useReporstData"
 import {

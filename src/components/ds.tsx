@@ -50,11 +50,17 @@ export function Button({
   className = "",
   variant = "default",
   size = "md",
-
+  fullWidth = false,
+  leftIcon,
+  loading = false,
+  disabled,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "default" | "primary" | "outline" | "ghost"
   size?: "sm" | "md" | "lg"
+  fullWidth?: boolean
+  leftIcon?: React.ReactNode
+  loading?: boolean
 }) {
   const base =
     "inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-all"
@@ -72,10 +78,19 @@ export function Button({
   }
   return (
     <button
-      className={[base, variants[variant], sizes[size], className].join(" ")}
-      disabled={props.disabled}
+      className={[
+        base,
+        variants[variant],
+        sizes[size],
+        fullWidth ? "w-full" : "",
+        loading ? "cursor-progress opacity-70" : "",
+        className,
+      ].join(" ")}
+      disabled={disabled || loading}
       {...props}
     >
+      {loading && <span className="mr-2">⏳</span>}
+      {!loading && leftIcon ? <span className="mr-2">{leftIcon}</span> : null}
       {children}
     </button>
   )
@@ -83,16 +98,27 @@ export function Button({
 
 export function Input({
   className = "",
+  label,
+  hint,
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  label?: string
+  hint?: string
+}) {
   return (
-    <input
-      className={[
-        "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#E91835] focus:ring-2 focus:ring-[#E91835]/20",
-        className,
-      ].join(" ")}
-      {...props}
-    />
+    <div className="flex flex-col gap-1.5">
+      {label ? (
+        <label className="text-sm font-medium text-slate-700">{label}</label>
+      ) : null}
+      <input
+        className={[
+          "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#E91835] focus:ring-2 focus:ring-[#E91835]/20",
+          className,
+        ].join(" ")}
+        {...props}
+      />
+      {hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
+    </div>
   )
 }
 
@@ -102,6 +128,7 @@ export function Modal({
   title,
   children,
   actions,
+  size,
 }: {
   open: boolean
   onClose: () => void
@@ -112,6 +139,7 @@ export function Modal({
     variant?: "outline" | "primary"
     onClick?: () => void
   }>
+  size?: string
 }) {
   if (!open) return null
   return (

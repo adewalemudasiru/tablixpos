@@ -60,7 +60,7 @@ export function PaymentDistribution({
                 ))}
               </Pie>
               <Tooltip
-                formatter={(v: number) => fmtK(v)}
+                formatter={(v: any) => fmtK(Number(v ?? 0))}
                 contentStyle={{
                   fontFamily: INTER,
                   fontSize: 11,

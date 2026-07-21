@@ -49,7 +49,7 @@ export function PrepQualityChart({ qualityData }: { qualityData: any[] }) {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(v: number) => `${v} orders`}
+                formatter={(v: any) => `${Number(v ?? 0)} orders`}
                 contentStyle={{
                   fontFamily: INTER,
                   fontSize: 11,

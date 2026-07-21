@@ -334,7 +334,7 @@ function MenuPreviewModal({ onClose }: { onClose: () => void }) {
                           >
                             <path
                               d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"
-                              stroke={colors.textPlaceholder}
+                              stroke={colors.textMuted}
                               strokeWidth="1.5"
                               strokeLinecap="round"
                             />

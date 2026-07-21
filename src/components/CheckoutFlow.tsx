@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { QRCodeSVG } from "qrcode.react"
 import svgPayment from "../imports/svg-0dm66gja4g"
 import svgSuccess from "../imports/svg-a3rrawmxu2"
-import svgReceipt from "../imports/svg-pj4pk2r2jd"
 import { Button } from "./ds"
 import { useAppStore } from "../store/AppContext"
 
@@ -61,10 +60,6 @@ const fmt = (n: number) =>
 
 function generateTxnNo() {
   return "TXN" + Date.now().toString().slice(-10)
-}
-
-function generateInvNo() {
-  return "INV-" + Date.now()
 }
 
 // --- Icon Components ---
