@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router"
 import { PinPad } from "@/components/PinPad"
 import { useAppStore } from "../../store/AppContext"
 import { authAPI } from "../../services/api"
-import imgFoodBg from "../../login-bg.png"
+import imgFoodBg from "../../assets/login-bg.png"
 import { motion, AnimatePresence } from "motion/react"
 
 const INTER = "'Inter', sans-serif"

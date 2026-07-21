@@ -1,16 +1,7 @@
-import React, { useState } from "react"
-import type { Product, CartItem, CartAddon } from "../../types/dashboard/common"
+import { useState } from "react"
+import type { Product, CartItem } from "../../types/dashboard/common"
 
 const ADDON_MAX_QTY = 5
-
-interface AddonModalProps {
-  product: Product
-  onClose: () => void
-  onConfirm: (item: CartItem) => void
-  initialVariantId?: string
-  initialAddonQtys?: Record<string, number>
-  initialQty?: number
-}
 
 export function AddonModal({
   product,
@@ -19,10 +10,18 @@ export function AddonModal({
   initialVariantId,
   initialAddonQtys,
   initialQty,
-}: AddonModalProps) {
-  const [selectedVariantId, setSelectedVariantId] = useState(
+}: {
+  product: Product
+  onClose: () => void
+  onConfirm: (item: CartItem) => void
+  initialVariantId?: string
+  initialAddonQtys?: Record<string, number>
+  initialQty?: number
+}) {
+  const [selectedVariantId, setSelectedVariantId] = useState<string>(
     initialVariantId ?? product.variants?.[0]?.id ?? ""
   )
+  // Each add-on stores its own qty: 0 means not selected, 1+ means how many portions (max 5)
   const [addonQtys, setAddonQtys] = useState<Record<string, number>>(
     initialAddonQtys ?? {}
   )
@@ -31,38 +30,38 @@ export function AddonModal({
   const selectedVariant = product.variants?.find(
     (v) => v.id === selectedVariantId
   )
+
+  // Variant price REPLACES the base price; fall back to base only when no variant selected
   const variantPrice = selectedVariant?.price ?? product.price
-  const addonsTotal = (product.addons ?? []).reduce((sum, addon) => {
-    const qty = addonQtys[addon.id] ?? 0
-    return sum + addon.price * qty
+
+  const addonsTotal = (product.addons ?? []).reduce((s, a) => {
+    const aqty = addonQtys[a.id] ?? 0
+    return s + a.price * aqty
   }, 0)
   const unitPrice = variantPrice + addonsTotal
   const total = unitPrice * qty
 
   const setAddonQty = (id: string, delta: number) => {
-    setAddonQtys((current) => {
-      const next = Math.max(
-        0,
-        Math.min(ADDON_MAX_QTY, (current[id] ?? 0) + delta)
-      )
-      return { ...current, [id]: next }
+    setAddonQtys((prev) => {
+      const next = Math.max(0, Math.min(ADDON_MAX_QTY, (prev[id] ?? 0) + delta))
+      return { ...prev, [id]: next }
     })
   }
 
   const handleConfirm = () => {
-    const selectedAddons: CartAddon[] = (product.addons ?? [])
-      .filter((addon) => (addonQtys[addon.id] ?? 0) > 0)
-      .map((addon) => ({
-        id: addon.id,
-        name: addon.name,
-        qty: addonQtys[addon.id],
-        price: addon.price,
+    // Build selected-addons list (only those with qty > 0)
+    const selectedAddons = (product.addons ?? [])
+      .filter((a) => (addonQtys[a.id] ?? 0) > 0)
+      .map((a) => ({
+        id: a.id,
+        name: a.name,
+        qty: addonQtys[a.id],
+        price: a.price,
       }))
-
     onConfirm({
       ...product,
       price: unitPrice,
-      baseUnitPrice: variantPrice,
+      baseUnitPrice: variantPrice, // stored so in-cart editing can recalculate correctly
       qty,
       selectedVariantId,
       selectedAddons,
@@ -70,28 +69,32 @@ export function AddonModal({
     onClose()
   }
 
-  const fmt = (value: number) =>
+  const fmt = (n: number) =>
     "\u20a6" +
-    value.toLocaleString("en-NG", {
+    n.toLocaleString("en-NG", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+
+      {/* Modal */}
       <div
-        className="relative flex max-h-[90vh] w-full max-w-[656px] flex-col overflow-clip rounded-[16px] bg-[var(--page-surface)] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)]"
-        onClick={(event) => event.stopPropagation()}
+        className="relative flex max-h-[90vh] w-full max-w-[656px] flex-col content-stretch overflow-clip rounded-[16px] bg-[var(--page-surface)] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)]"
+        onClick={(e) => e.stopPropagation()}
       >
+        {/* Sticky Header */}
         <div className="relative sticky top-0 z-10 h-[69px] w-full shrink-0 bg-[var(--page-surface)]">
           <div
-            className="pointer-events-none absolute inset-0 border-b border-solid border-[var(--page-border)]"
             aria-hidden="true"
+            className="pointer-events-none absolute inset-0 border-b border-solid border-[var(--page-border)]"
           />
           <div className="flex h-full items-center justify-between px-[16px]">
             <p
-              className="text-[16px] text-[var(--page-text)]"
+              className="text-[16px] text-[var(--page-text)] not-italic"
               style={{
                 fontFamily: "'SF Pro Text', 'Inter', sans-serif",
                 fontWeight: 400,
@@ -129,13 +132,15 @@ export function AddonModal({
           </div>
         </div>
 
+        {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto px-[16px] py-0">
-          <div className="relative flex w-full flex-col gap-[26px] py-[24px]">
+          <div className="relative flex w-full flex-col content-stretch items-start gap-[26px] py-[24px]">
+            {/* Select Variant */}
             {product.variants && product.variants.length > 0 && (
               <div className="flex w-full flex-col gap-[12px]">
                 <div className="flex items-center justify-between">
                   <p
-                    className="text-[16px] text-[var(--page-text)]"
+                    className="text-[16px] text-[var(--page-text)] not-italic"
                     style={{
                       fontFamily: "'SF Pro Text', 'Inter', sans-serif",
                       fontWeight: 600,
@@ -158,13 +163,13 @@ export function AddonModal({
                   )}
                 </div>
                 <div className="flex w-full flex-col gap-[8px]">
-                  {product.variants.map((variant) => {
-                    const totalPrice = variant.price
-                    const isSelected = selectedVariantId === variant.id
+                  {product.variants.map((v) => {
+                    const totalPrice = v.price // variant price IS the full price
+                    const isSelected = selectedVariantId === v.id
                     return (
                       <button
-                        key={variant.id}
-                        onClick={() => setSelectedVariantId(variant.id)}
+                        key={v.id}
+                        onClick={() => setSelectedVariantId(v.id)}
                         className={`flex w-full items-center justify-between rounded-[10px] border px-[16px] py-[12px] transition-all ${
                           isSelected
                             ? "border-[var(--c-danger-dot)] bg-[var(--c-danger-bg)]"
@@ -172,6 +177,7 @@ export function AddonModal({
                         }`}
                       >
                         <div className="flex items-center gap-3">
+                          {/* Radio indicator */}
                           <div
                             className="flex size-[18px] shrink-0 items-center justify-center rounded-full border-2"
                             style={{
@@ -197,7 +203,7 @@ export function AddonModal({
                                 : "var(--page-text)",
                             }}
                           >
-                            {variant.name}
+                            {v.name}
                           </span>
                         </div>
                         <span
@@ -220,10 +226,11 @@ export function AddonModal({
               </div>
             )}
 
+            {/* Add-ons */}
             {product.addons && product.addons.length > 0 && (
-              <div className="relative flex w-full flex-col gap-[12px]">
+              <div className="relative flex w-full shrink-0 flex-col content-stretch items-start gap-[12px]">
                 <p
-                  className="text-[16px] text-[var(--page-text)]"
+                  className="text-[16px] text-[var(--page-text)] not-italic"
                   style={{
                     fontFamily: "'SF Pro Text', 'Inter', sans-serif",
                     fontWeight: 400,
@@ -234,8 +241,8 @@ export function AddonModal({
                 </p>
                 <div className="flex w-full flex-col gap-[8px]">
                   {product.addons.map((addon) => {
-                    const addonQty = addonQtys[addon.id] ?? 0
-                    const isSelected = addonQty > 0
+                    const aqty = addonQtys[addon.id] ?? 0
+                    const isSelected = aqty > 0
                     return (
                       <div
                         key={addon.id}
@@ -270,12 +277,12 @@ export function AddonModal({
                         <div className="flex shrink-0 items-center gap-[8px]">
                           <button
                             onClick={() => setAddonQty(addon.id, -1)}
-                            disabled={addonQty === 0}
+                            disabled={aqty === 0}
                             className="flex size-[28px] items-center justify-center rounded-full border transition-colors"
                             style={{
                               borderColor:
-                                addonQty > 0 ? "#e91835" : "var(--page-border)",
-                              opacity: addonQty === 0 ? 0.4 : 1,
+                                aqty > 0 ? "#e91835" : "var(--page-border)",
+                              opacity: aqty === 0 ? 0.4 : 1,
                             }}
                           >
                             <svg
@@ -287,7 +294,7 @@ export function AddonModal({
                               <path
                                 d="M3 8H13"
                                 stroke={
-                                  addonQty > 0
+                                  aqty > 0
                                     ? "#e91835"
                                     : "var(--page-text-muted)"
                                 }
@@ -302,25 +309,23 @@ export function AddonModal({
                               fontWeight: 600,
                               fontSize: "15px",
                               color:
-                                addonQty > 0
-                                  ? "#e91835"
-                                  : "var(--page-text-muted)",
+                                aqty > 0 ? "#e91835" : "var(--page-text-muted)",
                               minWidth: 18,
                               textAlign: "center",
                             }}
                           >
-                            {addonQty}
+                            {aqty}
                           </span>
                           <button
                             onClick={() => setAddonQty(addon.id, 1)}
-                            disabled={addonQty >= ADDON_MAX_QTY}
+                            disabled={aqty >= ADDON_MAX_QTY}
                             className="flex size-[28px] items-center justify-center rounded-full border transition-colors"
                             style={{
                               borderColor:
-                                addonQty >= ADDON_MAX_QTY
+                                aqty >= ADDON_MAX_QTY
                                   ? "var(--page-border)"
                                   : "#e91835",
-                              opacity: addonQty >= ADDON_MAX_QTY ? 0.4 : 1,
+                              opacity: aqty >= ADDON_MAX_QTY ? 0.4 : 1,
                             }}
                           >
                             <svg
@@ -332,7 +337,7 @@ export function AddonModal({
                               <path
                                 d="M3 8H13M8 3V13"
                                 stroke={
-                                  addonQty >= ADDON_MAX_QTY
+                                  aqty >= ADDON_MAX_QTY
                                     ? "var(--page-text-muted)"
                                     : "#e91835"
                                 }
@@ -341,7 +346,7 @@ export function AddonModal({
                               />
                             </svg>
                           </button>
-                          {addonQty >= ADDON_MAX_QTY && (
+                          {aqty >= ADDON_MAX_QTY && (
                             <span
                               style={{
                                 fontFamily: "'Inter', sans-serif",
@@ -365,7 +370,7 @@ export function AddonModal({
                               }}
                             >
                               {"\u20a6"}
-                              {(addon.price * addonQty).toLocaleString()}
+                              {(addon.price * aqty).toLocaleString()}
                             </span>
                           )}
                         </div>
@@ -376,9 +381,10 @@ export function AddonModal({
               </div>
             )}
 
-            <div className="relative flex w-full flex-col gap-[12px]">
+            {/* Quantity */}
+            <div className="relative flex w-full shrink-0 flex-col content-stretch items-start gap-[12px]">
               <p
-                className="text-[16px] text-[var(--page-text)]"
+                className="text-[16px] text-[var(--page-text)] not-italic"
                 style={{
                   fontFamily: "'SF Pro Text', 'Inter', sans-serif",
                   fontWeight: 400,
@@ -389,7 +395,7 @@ export function AddonModal({
               </p>
               <div className="flex items-center gap-[16px]">
                 <button
-                  onClick={() => setQty((current) => Math.max(1, current - 1))}
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
                   className="flex size-[40px] items-center justify-center rounded-full border border-[var(--page-border)] transition-colors hover:border-[#e91835]"
                 >
                   <svg width="16" height="16" fill="none" viewBox="0 0 20 20">
@@ -414,7 +420,7 @@ export function AddonModal({
                   {qty}
                 </span>
                 <button
-                  onClick={() => setQty((current) => current + 1)}
+                  onClick={() => setQty((q) => q + 1)}
                   className="flex size-[40px] items-center justify-center rounded-full border border-[var(--page-border)] transition-colors hover:border-[#e91835]"
                 >
                   <svg width="16" height="16" fill="none" viewBox="0 0 20 20">
@@ -432,6 +438,7 @@ export function AddonModal({
           </div>
         </div>
 
+        {/* Footer */}
         <div className="shrink-0 border-t border-[var(--page-border)] px-[16px] py-[16px]">
           <div className="mb-[12px] flex items-center justify-between">
             <span

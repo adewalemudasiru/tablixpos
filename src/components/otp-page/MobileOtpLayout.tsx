@@ -3,7 +3,7 @@ import { OtpInput } from "./OtpInput"
 import { OtpError } from "./OtpError"
 import { OtpSuccessToast } from "./OtpSuccessToast"
 import { OtpResendButton } from "./OtpResendButton"
-import imgFoodBg from "../../login-bg.png"
+import imgFoodBg from "../../assets/login-bg.png"
 import type { OtpState } from "../../types/otp-page/otp"
 
 const INTER = "'Inter', sans-serif"

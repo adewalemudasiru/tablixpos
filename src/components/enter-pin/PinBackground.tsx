@@ -1,5 +1,5 @@
 import React from "react"
-import imgFoodBg from "../../login-bg.png"
+import imgFoodBg from "../../assets/login-bg.png"
 
 interface PinBackgroundProps {
   children: React.ReactNode

@@ -3,28 +3,38 @@
  * to the restaurant's digital menu.
  */
 
-import React, { useRef } from "react";
-import { QRCodeSVG } from "qrcode.react";
-import { AnimatePresence, motion } from "motion/react";
-import { colors, font, radius, shadows, Button } from "./ds";
-import svgPaths from "../../imports/svg-re625692x";
-import { useAppStore } from "../store/AppContext";
+import { useRef } from "react"
+import { QRCodeSVG } from "qrcode.react"
+import { AnimatePresence, motion } from "motion/react"
+import { colors, font, radius, shadows, Button } from "./ds"
+import svgPaths from "../imports/svg-re625692x"
+import { useAppStore } from "../store/AppContext"
 
-const INTER = "'Inter', sans-serif";
+const INTER = "'Inter', sans-serif"
 
 // Tablix logo (inline, same as AppLogo but self-contained for the modal)
 function ModalLogo() {
   return (
-    <div className="flex items-end justify-center shrink-0">
-      <div className="relative shrink-0 size-[26px]">
-        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 33 33">
+    <div className="flex shrink-0 items-end justify-center">
+      <div className="relative size-[26px] shrink-0">
+        <svg
+          className="absolute block size-full"
+          fill="none"
+          preserveAspectRatio="none"
+          viewBox="0 0 33 33"
+        >
           <path d={svgPaths.p30add40} fill="#E91835" />
         </svg>
       </div>
-      <div className="h-[26px] relative shrink-0 w-[85px]">
-        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 108 33.3458">
+      <div className="relative h-[26px] w-[85px] shrink-0">
+        <svg
+          className="absolute block size-full"
+          fill="none"
+          preserveAspectRatio="none"
+          viewBox="0 0 108 33.3458"
+        >
           <path d={svgPaths.p3c956500} fill="#111827" />
-          <path d={svgPaths.p7108500}  fill="#111827" />
+          <path d={svgPaths.p7108500} fill="#111827" />
           <path d={svgPaths.p134ade00} fill="#111827" />
           <path d={svgPaths.p207b6121} fill="#111827" />
           <path d={svgPaths.p25a44800} fill="#111827" />
@@ -32,68 +42,108 @@ function ModalLogo() {
         </svg>
       </div>
     </div>
-  );
+  )
 }
 
 // QR icon for the button
 function QRIcon({ color = "currentColor" }: { color?: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="3" width="7" height="7" rx="1" stroke={color} strokeWidth="1.8" />
-      <rect x="14" y="3" width="7" height="7" rx="1" stroke={color} strokeWidth="1.8" />
-      <rect x="3" y="14" width="7" height="7" rx="1" stroke={color} strokeWidth="1.8" />
+      <rect
+        x="3"
+        y="3"
+        width="7"
+        height="7"
+        rx="1"
+        stroke={color}
+        strokeWidth="1.8"
+      />
+      <rect
+        x="14"
+        y="3"
+        width="7"
+        height="7"
+        rx="1"
+        stroke={color}
+        strokeWidth="1.8"
+      />
+      <rect
+        x="3"
+        y="14"
+        width="7"
+        height="7"
+        rx="1"
+        stroke={color}
+        strokeWidth="1.8"
+      />
       <rect x="5" y="5" width="3" height="3" fill={color} />
       <rect x="16" y="5" width="3" height="3" fill={color} />
       <rect x="5" y="16" width="3" height="3" fill={color} />
-      <path d="M14 14h2v2h-2zM18 14h3M18 18h3M14 18v3M18 16h2v2" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M14 14h2v2h-2zM18 14h3M18 18h3M14 18v3M18 16h2v2"
+        stroke={color}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
-  );
+  )
 }
 
 // Print icon
 function PrintIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <polyline points="6 9 6 2 18 2 18 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="6" y="14" width="12" height="8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <polyline
+        points="6 9 6 2 18 2 18 9"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect
+        x="6"
+        y="14"
+        width="12"
+        height="8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
-  );
-}
-
-// Download icon
-function DownloadIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
+  )
 }
 
 interface MenuQRModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
 export function MenuQRModal({ isOpen, onClose }: MenuQRModalProps) {
-  const { menuUrl: storeMenuUrl, restaurantName } = useAppStore();
-  const businessId = localStorage.getItem("tablix_business_id") ?? "";
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-  const menuUrl = `${baseUrl}/menu-view${businessId ? `?b=${businessId}` : ""}`;
-  const printRef = useRef<HTMLDivElement>(null);
+  const { menuUrl: storeMenuUrl, restaurantName } = useAppStore()
+  const businessId = localStorage.getItem("tablix_business_id") ?? ""
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : ""
+  const menuUrl = `${baseUrl}/menu-view${businessId ? `?b=${businessId}` : ""}`
+  const printRef = useRef<HTMLDivElement>(null)
 
   const handlePrint = () => {
-    const printContent = printRef.current;
-    if (!printContent) return;
+    const printContent = printRef.current
+    if (!printContent) return
 
-    const win = window.open("", "_blank", "width=500,height=700");
-    if (!win) return;
+    const win = window.open("", "_blank", "width=500,height=700")
+    if (!win) return
 
     // Serialize the QR SVG
-    const svgEl = printContent.querySelector("svg");
-    const svgMarkup = svgEl ? svgEl.outerHTML : "";
+    const svgEl = printContent.querySelector("svg")
+    const svgMarkup = svgEl ? svgEl.outerHTML : ""
 
     win.document.write(`
       <!DOCTYPE html>
@@ -180,22 +230,22 @@ export function MenuQRModal({ isOpen, onClose }: MenuQRModalProps) {
           <script>window.onload = function() { window.print(); window.close(); }<\/script>
         </body>
       </html>
-    `);
-    win.document.close();
-  };
+    `)
+    win.document.close()
+  }
 
   const handleDownload = () => {
-    const svgEl = printRef.current?.querySelector("svg");
-    if (!svgEl) return;
-    const svgData = new XMLSerializer().serializeToString(svgEl);
-    const blob = new Blob([svgData], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "tablix-menu-qr.svg";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+    const svgEl = printRef.current?.querySelector("svg")
+    if (!svgEl) return
+    const svgData = new XMLSerializer().serializeToString(svgEl)
+    const blob = new Blob([svgData], { type: "image/svg+xml" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "tablix-menu-qr.svg"
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <AnimatePresence>
@@ -209,7 +259,10 @@ export function MenuQRModal({ isOpen, onClose }: MenuQRModalProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             className="fixed inset-0 z-50"
-            style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(2px)" }}
+            style={{
+              background: "rgba(0,0,0,0.45)",
+              backdropFilter: "blur(2px)",
+            }}
             onClick={onClose}
           />
 
@@ -224,12 +277,13 @@ export function MenuQRModal({ isOpen, onClose }: MenuQRModalProps) {
             style={{ pointerEvents: "none" }}
           >
             <div
-              className="relative page-card-bg flex flex-col overflow-hidden"
+              className="page-card-bg relative flex flex-col overflow-hidden"
               style={{
                 width: "100%",
                 maxWidth: 420,
                 borderRadius: radius.xl,
-                boxShadow: "0 24px 64px -12px rgba(0,0,0,0.28), 0 8px 24px -4px rgba(0,0,0,0.12)",
+                boxShadow:
+                  "0 24px 64px -12px rgba(0,0,0,0.28), 0 8px 24px -4px rgba(0,0,0,0.12)",
                 border: `1px solid var(--page-border)`,
                 pointerEvents: "auto",
               }}
@@ -241,49 +295,79 @@ export function MenuQRModal({ isOpen, onClose }: MenuQRModalProps) {
               >
                 <div className="flex items-center gap-2.5">
                   <span
-                    className="flex items-center justify-center rounded-xl size-9"
-                    style={{ background: colors.primaryLight, border: `1px solid ${colors.primaryMid}` }}
+                    className="flex size-9 items-center justify-center rounded-xl"
+                    style={{
+                      background: colors.primaryLight,
+                      border: `1px solid ${colors.primaryMid}`,
+                    }}
                   >
                     <QRIcon color={colors.primary} />
                   </span>
                   <div>
-                    <p style={{ fontFamily: INTER, fontWeight: 700, fontSize: font.size.base, color: "var(--page-text)", lineHeight: "20px" }}>
+                    <p
+                      style={{
+                        fontFamily: INTER,
+                        fontWeight: 700,
+                        fontSize: font.size.base,
+                        color: "var(--page-text)",
+                        lineHeight: "20px",
+                      }}
+                    >
                       Menu QR Code
                     </p>
-                    <p style={{ fontFamily: INTER, fontSize: font.size.xs, color: "var(--page-text-muted)", lineHeight: "16px" }}>
+                    <p
+                      style={{
+                        fontFamily: INTER,
+                        fontSize: font.size.xs,
+                        color: "var(--page-text-muted)",
+                        lineHeight: "16px",
+                      }}
+                    >
                       Share with customers to view your menu
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={onClose}
-                  className="flex items-center justify-center size-8 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="flex size-8 items-center justify-center rounded-xl transition-colors hover:bg-gray-100"
                   style={{ color: colors.textMuted, flexShrink: 0 }}
                 >
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M11 3L3 11M3 3l8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    <path
+                      d="M11 3L3 11M3 3l8 8"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 </button>
               </div>
 
               {/* QR card (printable area) */}
-              <div className="flex flex-col items-center px-8 py-8 gap-5">
+              <div className="flex flex-col items-center gap-5 px-8 py-8">
                 <div
                   ref={printRef}
-                  className="flex flex-col items-center gap-4 w-full rounded-2xl py-8 px-6 page-surface-2"
+                  className="page-surface-2 flex w-full flex-col items-center gap-4 rounded-2xl px-6 py-8"
                   style={{ border: `1px solid var(--page-border)` }}
                 >
                   {/* Restaurant name */}
                   <div className="flex flex-col items-center gap-1.5">
                     <ModalLogo />
-                    <p style={{ fontFamily: INTER, fontSize: font.size.sm, color: "var(--page-text-muted)", lineHeight: "16px" }}>
+                    <p
+                      style={{
+                        fontFamily: INTER,
+                        fontSize: font.size.sm,
+                        color: "var(--page-text-muted)",
+                        lineHeight: "16px",
+                      }}
+                    >
                       {restaurantName}
                     </p>
                   </div>
 
                   {/* QR code */}
                   <div
-                    className="flex items-center justify-center rounded-2xl page-card-bg"
+                    className="page-card-bg flex items-center justify-center rounded-2xl"
                     style={{
                       padding: 16,
                       border: `1px solid var(--page-border)`,
@@ -302,20 +386,33 @@ export function MenuQRModal({ isOpen, onClose }: MenuQRModalProps) {
 
                   {/* Call to action */}
                   <div className="flex flex-col items-center gap-1 text-center">
-                    <p style={{ fontFamily: INTER, fontWeight: 700, fontSize: 15, color: "var(--page-text)", letterSpacing: "-0.2px" }}>
+                    <p
+                      style={{
+                        fontFamily: INTER,
+                        fontWeight: 700,
+                        fontSize: 15,
+                        color: "var(--page-text)",
+                        letterSpacing: "-0.2px",
+                      }}
+                    >
                       Scan to View Menu
                     </p>
-                    <p style={{ fontFamily: INTER, fontSize: font.size.xs, color: "var(--page-text-muted)", lineHeight: "16px" }}>
+                    <p
+                      style={{
+                        fontFamily: INTER,
+                        fontSize: font.size.xs,
+                        color: "var(--page-text-muted)",
+                        lineHeight: "16px",
+                      }}
+                    >
                       Point your camera at the QR code to browse our full menu
                     </p>
                   </div>
 
                   {/* URL pill */}
-                  
                 </div>
 
                 {/* Info note */}
-                
               </div>
 
               {/* Actions */}
@@ -323,8 +420,12 @@ export function MenuQRModal({ isOpen, onClose }: MenuQRModalProps) {
                 className="flex items-center gap-3 px-6 py-4"
                 style={{ borderTop: `1px solid var(--page-border)` }}
               >
-                
-                <Button variant="primary" size="md" onClick={handlePrint} className="flex-1 flex items-center gap-2 justify-center">
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={handlePrint}
+                  className="flex flex-1 items-center justify-center gap-2"
+                >
                   <PrintIcon />
                   Print QR Code
                 </Button>
@@ -334,5 +435,5 @@ export function MenuQRModal({ isOpen, onClose }: MenuQRModalProps) {
         </>
       )}
     </AnimatePresence>
-  );
+  )
 }

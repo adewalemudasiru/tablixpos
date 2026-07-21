@@ -1,7 +1,8 @@
 import React from "react"
 import { QRCodeSVG } from "qrcode.react"
 import { useAppStore } from "../../../store/AppContext"
-import { Button, colors, font, shadows } from "../../ds"
+import { font, shadows } from "../../ds/tokens"
+import { Button } from "../../ds/Button"
 import { Card } from "../common"
 
 export function MenuQRSection() {

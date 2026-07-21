@@ -1,6 +1,7 @@
 import { Button } from "../ds/Button"
 import { AppLogo } from "../AppSidebar"
 import { NavMenu } from "../NavMenu"
+import { colors } from "../ds/tokens"
 
 interface ExpensesHeaderProps {
   onAddClick: () => void

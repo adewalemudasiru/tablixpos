@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
-import { useLocation, useNavigate } from "react-router"
+import { useNavigate, useLocation } from "react-router"
 import { toast } from "sonner"
 import { addActivityEntry } from "../services/activityLog"
 import { ordersAPI, customersAPI, tableAPI } from "../services/api"
+import { usePrinter } from "../hooks/usePrinter"
 import type { ReceiptData } from "../services/printer"
 import {
   saveCart,
@@ -11,21 +12,12 @@ import {
   generateTransactionId,
   type Transaction,
 } from "../services/storage"
-import { usePrinter } from "../hooks/usePrinter"
 import { useAppStore, nextOrderNo, usePermissions } from "../store/AppContext"
 import type { KDSOrder } from "../store/AppContext"
 import { WALK_IN } from "../components/CustomerSelector"
 import type { CustomerType } from "../components/CustomerSelector"
-import type { Product, CartItem, CategoryItem } from "../types/dashboard/common"
-
-const categoryIconId = (name: string) => {
-  const normalized = (name || "").toLowerCase()
-  if (normalized.includes("drinks")) return "drink"
-  if (normalized.includes("dessert")) return "dessert"
-  if (normalized.includes("snack")) return "snack"
-  if (normalized.includes("main")) return "appetizer"
-  return "all"
-}
+import type { Product, CartItem, CategoryItem } from "@/types/dashboard/common"
+import { categoryIconId } from "@/constants/dashboard"
 
 export function useDashboard() {
   const {
@@ -37,6 +29,7 @@ export function useDashboard() {
     menuItems,
     menuCategories,
     activeStaff,
+    setActiveStaff,
     staff,
     transactions,
     consumeIngredients,
@@ -45,16 +38,17 @@ export function useDashboard() {
     loyaltyConfig,
     tables,
     setTableStatus,
-    setActiveStaff,
     posConfig,
     businessConfig,
     menuUrl,
     tablesEnabled,
     theme,
   } = useAppStore()
+
   const navigate = useNavigate()
   const location = useLocation()
   const printer = usePrinter()
+
   const [lastReceiptData, setLastReceiptData] = useState<ReceiptData | null>(
     null
   )
@@ -67,6 +61,7 @@ export function useDashboard() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [addonProduct, setAddonProduct] = useState<Product | null>(null)
+  const [showLogout, setShowLogout] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [checkoutInitialMethod, setCheckoutInitialMethod] = useState<
     "cash" | "card" | "transfer"
@@ -78,31 +73,39 @@ export function useDashboard() {
     null
   )
   const [isProcessing, setIsProcessing] = useState(false)
+  const receiptRef = useRef<HTMLDivElement>(null)
+
+  // Discount state
   const [discount, setDiscount] = useState<{
     type: "percent" | "flat"
     value: number
   }>({ type: "flat", value: 0 })
+
   const [tableNo, setTableNo] = useState<string>(() => {
     try {
       const p = new URLSearchParams(window.location.search)
       return p.get("table") || ""
-    } catch {
+    } catch (_) {
       return ""
     }
   })
+
   const [selectedCartIdx, setSelectedCartIdx] = useState<number | null>(null)
-  const [keypadInput, setKeypadInput] = useState("")
+  const [, setKeypadInput] = useState<string>("")
   const [prevCartLength, setPrevCartLength] = useState(0)
+
+  // Manager override state
   const [overrideRequest, setOverrideRequest] = useState<{
     action: string
-    detail: string
+    detail?: string
     onApprove: (approver: string) => void
   } | null>(null)
   const [showShiftClose, setShowShiftClose] = useState(false)
-  const receiptRef = useRef<HTMLDivElement>(null)
+
   const permissions = usePermissions()
   const isCashier = !permissions.includes("manager_override")
 
+  // Live products derived from global menu items
   const products: Product[] = useMemo(
     () =>
       menuItems
@@ -129,6 +132,7 @@ export function useDashboard() {
     [menuItems]
   )
 
+  // Derived category tabs
   const CATEGORY_ITEMS: CategoryItem[] = useMemo(
     () => [
       { id: "all", label: "All Menu", iconId: "all" },
@@ -147,12 +151,13 @@ export function useDashboard() {
     [menuCategories, products]
   )
 
+  // Filtered products
   const filteredProducts = useMemo(
     () =>
       products.filter((p) => {
         const matchesCategory =
           activeCategory === "all" || p.category === activeCategory
-        const matchesSearch = p.name
+        const matchesSearch = (p.name || "")
           .toLowerCase()
           .includes((search || "").toLowerCase())
         return matchesCategory && matchesSearch
@@ -160,53 +165,32 @@ export function useDashboard() {
     [products, activeCategory, search]
   )
 
-  const cartCount = cart.reduce((s, i) => s + i.qty, 0)
-  const cartSubtotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
-  const cartDiscountAmount =
-    discount.value > 0
-      ? discount.type === "percent"
-        ? Math.round((cartSubtotal * discount.value) / 100)
-        : Math.min(discount.value, cartSubtotal)
-      : 0
-  const cartDiscountedSubtotal = cartSubtotal - cartDiscountAmount
-  const cartVat = taxConfig.enabled
-    ? taxConfig.inclusive
-      ? Math.round(
-          cartDiscountedSubtotal -
-            cartDiscountedSubtotal / (1 + taxConfig.rate / 100)
-        )
-      : Math.round((cartDiscountedSubtotal * taxConfig.rate) / 100)
-    : 0
-  const cartSvcCharge = taxConfig.serviceCharge
-    ? Math.round((cartDiscountedSubtotal * taxConfig.serviceRate) / 100)
-    : 0
-  const cartTotal = taxConfig.inclusive
-    ? cartDiscountedSubtotal + cartSvcCharge
-    : cartDiscountedSubtotal + cartVat + cartSvcCharge
-
-  const loadSavedCart = useCallback(async () => {
-    const saved = await loadCart()
-    if (saved && Array.isArray(saved)) setCart(saved)
+  // Initial cart load
+  useEffect(() => {
+    loadCart().then((c) => {
+      if (c && Array.isArray(c)) setCart(c)
+    })
   }, [])
 
-  useEffect(() => {
-    loadSavedCart()
-  }, [loadSavedCart])
-
+  // Save cart changes
   useEffect(() => {
     saveCart(cart)
   }, [cart])
 
+  // Sync table parameter from location search
   useEffect(() => {
     const p = new URLSearchParams(location.search)
     const tableParam = p.get("table")
     if (tableParam) {
       setActiveTab("pos")
+
       const prevKey = tableNo ? `tablix_cart_${tableNo}` : "tablix_cart"
       localStorage.setItem(prevKey, JSON.stringify(cart))
+
       const newKey = `tablix_cart_${tableParam}`
       const saved = localStorage.getItem(newKey)
       const newCart = saved ? JSON.parse(saved) : []
+
       setTableNo(tableParam)
       setCart(newCart)
 
@@ -222,11 +206,13 @@ export function useDashboard() {
       } else {
         setSelectedCustomer(WALK_IN)
       }
+
       navigate("/dashboard", { replace: true })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search, navigate, tables])
+  }, [location.search, navigate, tables, setSelectedCustomer])
 
+  // Sync cart selection
   useEffect(() => {
     if (cart.length > prevCartLength) {
       setSelectedCartIdx(cart.length - 1)
@@ -237,58 +223,33 @@ export function useDashboard() {
     setPrevCartLength(cart.length)
   }, [cart.length, prevCartLength, selectedCartIdx])
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement
-      ) {
-        return
-      }
+  const switchTable = useCallback(
+    (newTableNo: string) => {
+      const prevKey = tableNo ? `tablix_cart_${tableNo}` : "tablix_cart"
+      localStorage.setItem(prevKey, JSON.stringify(cart))
 
-      if (e.key === "Escape") {
-        if (cart.length > 0 && window.confirm("Clear entire cart?")) {
-          clearCartForActiveTable()
-          toast.success("Cart cleared")
-        }
-        return
-      }
+      const newKey = newTableNo ? `tablix_cart_${newTableNo}` : "tablix_cart"
+      const saved = localStorage.getItem(newKey)
+      const newCart = saved ? JSON.parse(saved) : []
 
-      if (e.key === "Enter" && cart.length > 0 && !checkoutOpen) {
-        handleCheckout()
-        return
-      }
+      setTableNo(newTableNo)
+      setCart(newCart)
 
-      const num = parseInt(e.key)
-      if (!isNaN(num) && num >= 1 && num <= 9) {
-        const currentFiltered = products.filter((p) => {
-          const matchesCategory =
-            activeCategory === "all" || p.category === activeCategory
-          const matchesSearch = p.name
-            .toLowerCase()
-            .includes((search || "").toLowerCase())
-          return matchesCategory && matchesSearch
+      const table = tables.find(
+        (t) => t.id === newTableNo || t.name === newTableNo
+      )
+      if (table && table.customerName && table.customerName !== "Walk-in") {
+        setSelectedCustomer({
+          id: "custom",
+          name: table.customerName,
+          phone: "",
         })
-        const product = currentFiltered[num - 1]
-        if (product) {
-          handleProductAdd(product)
-          toast.success(`Added ${product.name}`)
-        }
+      } else {
+        setSelectedCustomer(WALK_IN)
       }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [
-    cart.length,
-    activeCategory,
-    search,
-    checkoutOpen,
-    products,
-    clearCartForActiveTable,
-    handleCheckout,
-    handleProductAdd,
-  ])
+    },
+    [tableNo, cart, tables, setSelectedCustomer]
+  )
 
   const clearCartForActiveTable = useCallback(() => {
     setCart([])
@@ -341,13 +302,17 @@ export function useDashboard() {
     }
   }
 
+  const removeItem = (index: number) => {
+    setCart((prev) => prev.filter((_, i) => i !== index))
+  }
+
   const guardedRemoveItem = (idx: number) => {
     const item = cart[idx]
     if (!item) return
     if (isCashier) {
       setOverrideRequest({
         action: "Remove item from order",
-        detail: `"${item.name}" x${item.qty} = ₦${(item.price * item.qty).toLocaleString()}`,
+        detail: `"${item.name}" x${item.qty} = \u20a6${(item.price * item.qty).toLocaleString()}`,
         onApprove: (approver) => {
           setCart((prev) => prev.filter((_, i) => i !== idx))
           setOverrideRequest(null)
@@ -401,6 +366,56 @@ export function useDashboard() {
     })
   }
 
+  const handlePrint = useCallback(async () => {
+    if (!lastTransaction) return
+
+    const receiptData: ReceiptData = {
+      businessName: restaurantName,
+      address: businessConfig.address,
+      phone: businessConfig.phone,
+      receiptNo: lastTransaction.id,
+      date: new Date(lastTransaction.timestamp).toLocaleString("en-NG"),
+      cashier: lastTransaction.cashier ?? activeStaff?.name ?? "Owner",
+      tableNo: lastTransaction.tableNo,
+      customer:
+        lastTransaction.customer?.name !== "Walk-in"
+          ? lastTransaction.customer?.name
+          : undefined,
+      items: lastTransaction.items.map((i) => ({
+        name: i.name,
+        qty: i.qty,
+        price: i.price,
+      })),
+      subtotal: lastTransaction.subtotal,
+      tax: lastTransaction.vat,
+      taxName: taxConfig.name,
+      serviceCharge: lastTransaction.serviceCharge,
+      total: lastTransaction.total,
+      paymentMethod: lastTransaction.paymentMethod ?? "Cash",
+      footer: posConfig.receiptFooter,
+      showQR: posConfig.showQR,
+      menuUrl: menuUrl || window.location.origin + "/menu-view",
+    }
+
+    setLastReceiptData(receiptData)
+    const result = await printer.print(receiptData)
+
+    if (result === "qz") {
+      toast.success("Receipt sent to printer")
+    } else if (result === "browser") {
+      toast.success("Receipt opened for printing")
+    }
+  }, [
+    lastTransaction,
+    restaurantName,
+    businessConfig,
+    taxConfig,
+    posConfig,
+    menuUrl,
+    activeStaff,
+    printer,
+  ])
+
   const addToCart = (product: Product) => {
     setCart((prev) => {
       const existing = prev.find((i) => i.id === product.id && !i.sentToKitchen)
@@ -433,10 +448,6 @@ export function useDashboard() {
     })
   }
 
-  const replaceCartItem = (idx: number, item: CartItem) => {
-    setCart((prev) => prev.map((it, i) => (i === idx ? item : it)))
-  }
-
   const handleProductAdd = (product: Product) => {
     const variantCount = product.variants?.length ?? 0
     const addonCount = product.addons?.length ?? 0
@@ -458,44 +469,81 @@ export function useDashboard() {
     }
   }
 
-  const updateQty = (index: number, delta: number) => {
-    setCart((prev) => {
-      const updated = prev.map((item, i) =>
-        i === index ? { ...item, qty: item.qty + delta } : item
-      )
-      return updated.filter((i) => i.qty > 0)
-    })
+  const handleCheckout = (method?: "cash" | "card" | "transfer") => {
+    setCheckoutInitialMethod(method || "cash")
+    setCheckoutOpen(true)
   }
 
-  const removeItem = (index: number) => {
-    setCart((prev) => prev.filter((_, i) => i !== index))
-  }
-
-  const switchTable = useCallback(
-    (newTableNo: string) => {
-      const prevKey = tableNo ? `tablix_cart_${tableNo}` : "tablix_cart"
-      localStorage.setItem(prevKey, JSON.stringify(cart))
-      const newKey = newTableNo ? `tablix_cart_${newTableNo}` : "tablix_cart"
-      const saved = localStorage.getItem(newKey)
-      const newCart = saved ? JSON.parse(saved) : []
-      setTableNo(newTableNo)
-      setCart(newCart)
-      const table = tables.find(
-        (t) => t.id === newTableNo || t.name === newTableNo
-      )
-      if (table && table.customerName && table.customerName !== "Walk-in") {
-        setSelectedCustomer({
-          id: "custom",
-          name: table.customerName,
-          phone: "",
-        })
-      } else {
-        setSelectedCustomer(WALK_IN)
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        return
       }
-    },
-    [tableNo, cart, tables]
-  )
 
+      if (e.key === "Escape") {
+        if (cart.length > 0 && confirm("Clear entire cart?")) {
+          clearCartForActiveTable()
+          toast.success("Cart cleared")
+        }
+        return
+      }
+
+      if (e.key === "Enter" && cart.length > 0 && !checkoutOpen) {
+        handleCheckout()
+        return
+      }
+
+      const num = parseInt(e.key)
+      if (!isNaN(num) && num >= 1 && num <= 9) {
+        const currentFiltered = products.filter((p) => {
+          const matchesCategory =
+            activeCategory === "all" || p.category === activeCategory
+          const matchesSearch = (p.name || "")
+            .toLowerCase()
+            .includes((search || "").toLowerCase())
+          return matchesCategory && matchesSearch
+        })
+        const product = currentFiltered[num - 1]
+        if (product) {
+          handleProductAdd(product)
+          toast.success(`Added ${product.name}`)
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [cart, activeCategory, search, checkoutOpen, products, clearCartForActiveTable])
+
+  const cartSubtotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
+  const cartDiscountAmount =
+    discount.value > 0
+      ? discount.type === "percent"
+        ? Math.round((cartSubtotal * discount.value) / 100)
+        : Math.min(discount.value, cartSubtotal)
+      : 0
+  const cartDiscountedSubtotal = cartSubtotal - cartDiscountAmount
+
+  const cartVat = taxConfig.enabled
+    ? taxConfig.inclusive
+      ? Math.round(
+          cartDiscountedSubtotal -
+            cartDiscountedSubtotal / (1 + taxConfig.rate / 100)
+        )
+      : Math.round((cartDiscountedSubtotal * taxConfig.rate) / 100)
+    : 0
+  const cartSvcCharge = taxConfig.serviceCharge
+    ? Math.round((cartDiscountedSubtotal * taxConfig.serviceRate) / 100)
+    : 0
+  const cartTotal = taxConfig.inclusive
+    ? cartDiscountedSubtotal + cartSvcCharge
+    : cartDiscountedSubtotal + cartVat + cartSvcCharge
+
+  // Real-time table status synchronization
   useEffect(() => {
     if (tableNo && tables.length > 0) {
       const table = tables.find((t) => t.id === tableNo || t.name === tableNo)
@@ -535,67 +583,17 @@ export function useDashboard() {
     }
   }, [cartTotal, tableNo, tables, setTableStatus, selectedCustomer.name])
 
-  const handleCheckout = (method?: "cash" | "card" | "transfer") => {
-    setCheckoutInitialMethod(method || "cash")
-    setCheckoutOpen(true)
-  }
-
-  const handlePrint = useCallback(async () => {
-    if (!lastTransaction) return
-    const receiptData: ReceiptData = {
-      businessName: restaurantName,
-      address: businessConfig.address,
-      phone: businessConfig.phone,
-      receiptNo: lastTransaction.id,
-      date: new Date(lastTransaction.timestamp).toLocaleString("en-NG"),
-      cashier: lastTransaction.cashier ?? activeStaff?.name ?? "Owner",
-      tableNo: lastTransaction.tableNo,
-      customer:
-        lastTransaction.customer.name !== "Walk-in"
-          ? lastTransaction.customer.name
-          : undefined,
-      items: lastTransaction.items.map((i) => ({
-        name: i.name,
-        qty: i.qty,
-        price: i.price,
-      })),
-      subtotal: lastTransaction.subtotal,
-      tax: lastTransaction.vat,
-      taxName: taxConfig.name,
-      serviceCharge: lastTransaction.serviceCharge,
-      total: lastTransaction.total,
-      paymentMethod: lastTransaction.paymentMethod ?? "Cash",
-      footer: posConfig.receiptFooter,
-      showQR: posConfig.showQR,
-      menuUrl: menuUrl || window.location.origin + "/menu-view",
-    }
-    setLastReceiptData(receiptData)
-    const result = await printer.print(receiptData)
-    if (result === "qz") {
-      toast.success("Receipt sent to printer")
-    } else if (result === "browser") {
-      toast.success("Receipt opened for printing")
-    }
-  }, [
-    lastTransaction,
-    restaurantName,
-    businessConfig,
-    taxConfig,
-    posConfig,
-    menuUrl,
-    activeStaff,
-    printer,
-  ])
-
   const handlePaymentComplete = async (
     paymentMethod: string = "Cash",
     cashTendered: number = 0
   ) => {
     setIsProcessing(true)
+
     const changeAmount =
       paymentMethod.toLowerCase() === "cash" && cashTendered > cartTotal
         ? cashTendered - cartTotal
         : 0
+
     const transaction: Transaction = {
       id: generateTransactionId(),
       timestamp: Date.now(),
@@ -639,13 +637,16 @@ export function useDashboard() {
       cashier: activeStaff ? activeStaff.name : restaurantName + " Owner",
       status: "completed",
     }
+
     addTransaction(transaction)
     setLastTransaction(transaction)
+
     const staffName = activeStaff ? activeStaff.name : "Owner"
     consumeIngredients(
       cart.map((item) => ({ menuItemId: item.id, qty: item.qty })),
       staffName
     )
+
     const staffRole = activeStaff ? activeStaff.role : "Owner"
     const itemSummary = cart
       .map((i) => `${i.name}${i.qty > 1 ? " x" + i.qty : ""}`)
@@ -657,8 +658,9 @@ export function useDashboard() {
       action: "Processed sale",
       category: "Sale",
       timestamp: Date.now(),
-      detail: `₦${cartTotal.toLocaleString()} - ${itemSummary}`,
+      detail: `${"\u20a6"}${cartTotal.toLocaleString()} - ${itemSummary}`,
     })
+
     if (
       selectedCustomer.id !== "walk-in" &&
       loyaltyConfig.enabled &&
@@ -676,6 +678,7 @@ export function useDashboard() {
         addLoyaltyPoints(selectedCustomer.id, loyaltyEarned, cartTotal)
       }
     }
+
     if (kotEnabled) {
       const unsentItems = cart.filter((item) => !item.sentToKitchen)
       if (unsentItems.length > 0) {
@@ -686,6 +689,7 @@ export function useDashboard() {
           if (!itemsByStation[st]) itemsByStation[st] = []
           itemsByStation[st].push(item)
         })
+
         Object.entries(itemsByStation).forEach(([stationName, stItems]) => {
           const kdsOrder: KDSOrder = {
             id:
@@ -723,6 +727,7 @@ export function useDashboard() {
         })
       }
     }
+
     if (tableNo && tables.length > 0) {
       const table = tables.find((t) => t.id === tableNo || t.name === tableNo)
       if (table) {
@@ -743,7 +748,9 @@ export function useDashboard() {
         localStorage.removeItem(`tablix_cart_${table.id}`)
       }
     }
+
     const cartSnapshot = [...cart]
+
     setCart([])
     clearCart()
     setCheckoutOpen(false)
@@ -775,6 +782,7 @@ export function useDashboard() {
                 : "Cash") as "Cash" | "Card" | "Mobile" | "Wallet",
           amount: cartTotal,
         })
+
         if (selectedCustomer.id !== "walk-in" && loyaltyConfig.enabled) {
           const points =
             loyaltyConfig.rewardType === "percentage"
@@ -798,16 +806,22 @@ export function useDashboard() {
       description: `Receipt #${transaction.id}`,
       duration: 3000,
     })
+
     if (posConfig.autoPrint) {
       setTimeout(() => handlePrint(), 500)
     }
+
     setTimeout(() => setOrderSuccess(false), 2500)
   }
 
   const handleSendToKitchenOrSaveTab = async () => {
-    if (!tableNo || cart.length === 0) return
+    if (!tableNo) return
+    if (cart.length === 0) return
+
     setIsProcessing(true)
+
     const unsentItems = cart.filter((item) => !item.sentToKitchen)
+
     if (kotEnabled && unsentItems.length > 0) {
       const sharedOrderNo = nextOrderNo(kdsOrders)
       const itemsByStation: Record<string, CartItem[]> = {}
@@ -816,6 +830,7 @@ export function useDashboard() {
         if (!itemsByStation[st]) itemsByStation[st] = []
         itemsByStation[st].push(item)
       })
+
       Object.entries(itemsByStation).forEach(([stationName, stItems]) => {
         const kdsOrder: KDSOrder = {
           id:
@@ -855,7 +870,9 @@ export function useDashboard() {
         addKDSOrder(kdsOrder)
       })
     }
+
     const updatedCart = cart.map((item) => ({ ...item, sentToKitchen: true }))
+
     const table = tables.find((t) => t.id === tableNo || t.name === tableNo)
     if (table) {
       localStorage.setItem(
@@ -866,7 +883,9 @@ export function useDashboard() {
         `tablix_cart_${table.id}`,
         JSON.stringify(updatedCart)
       )
+
       const currentTotal = Math.round(cartTotal)
+
       setTableStatus(table.id, "occupied", {
         occupiedAt: table.occupiedAt || new Date().toISOString(),
         customerName:
@@ -875,6 +894,7 @@ export function useDashboard() {
             : table.customerName || "POS Order",
         orderTotal: currentTotal,
       })
+
       try {
         await tableAPI.update(table.id, {
           status: "occupied",
@@ -887,11 +907,13 @@ export function useDashboard() {
         })
       } catch (_) {}
     }
+
     const staffName = activeStaff ? activeStaff.name : "Owner"
     const staffRole = activeStaff ? activeStaff.role : "Owner"
     const detailMsg = kotEnabled
       ? `Sent ${unsentItems.length} new items to kitchen for Table ${tableNo}`
       : `Saved bill for Table ${tableNo}`
+
     addActivityEntry({
       staffName,
       role: staffRole,
@@ -900,6 +922,7 @@ export function useDashboard() {
       timestamp: Date.now(),
       detail: detailMsg,
     })
+
     setCart([])
     clearCart()
     setTableNo("")
@@ -907,88 +930,96 @@ export function useDashboard() {
     setSelectedCartIdx(null)
     setKeypadInput("")
     setIsProcessing(false)
+
     toast.success(
       kotEnabled ? "Sent to kitchen and tab saved!" : "Tab saved and held!"
     )
   }
 
   return {
+    // App store states & variables
+    activeStaff,
+    setActiveStaff,
+    staff,
+    transactions,
+    taxConfig,
+    restaurantName,
+    tables,
+    tablesEnabled,
+    theme,
+    kotEnabled,
+
+    // Router & navigation
+    navigate,
+
+    // Receipt & Printer
+    printer,
+    lastReceiptData,
+    lastTransaction,
+    receiptRef,
+    handlePrint,
+
+    // Layout & tabs
     activeTab,
     setActiveTab,
-    showSearchModal,
-    setShowSearchModal,
-    activeCategory,
-    setActiveCategory,
+
+    // Search
     search,
     setSearch,
+    showSearchModal,
+    setShowSearchModal,
+
+    // Products & Categories
     products,
     filteredProducts,
     CATEGORY_ITEMS,
+    activeCategory,
+    setActiveCategory,
+    addonProduct,
+    setAddonProduct,
+
+    // Cart
     cart,
     setCart,
     selectedCartIdx,
     setSelectedCartIdx,
-    tableNo,
-    selectedCustomer,
-    setSelectedCustomer,
-    orderSuccess,
-    setOrderSuccess,
-    addonProduct,
-    setAddonProduct,
-    checkoutOpen,
-    setCheckoutOpen,
-    checkoutInitialMethod,
-    setCheckoutInitialMethod,
-    showHistory,
-    setShowHistory,
-    lastTransaction,
-    setLastTransaction,
-    isProcessing,
-    setIsProcessing,
-    discount,
-    setDiscount,
-    receiptRef,
-    search,
-    setSearch,
-    handleKeypadPress,
-    clearCartForActiveTable,
+    setKeypadInput,
     guardedClearCart,
     guardedRemoveItem,
-    handlePrint,
-    addToCart,
     addCartItem,
-    replaceCartItem,
     handleProductAdd,
-    updateQty,
-    removeItem,
-    cartTotal,
+    handleKeypadPress,
+
+    // Customer & Table
+    selectedCustomer,
+    setSelectedCustomer,
+    tableNo,
+    switchTable,
+
+    // Discount & Totals
+    discount,
+    setDiscount,
+    cartSubtotal,
     cartDiscountAmount,
     cartVat,
     cartSvcCharge,
+    cartTotal,
+
+    // Checkout & Modals
+    orderSuccess,
+    checkoutOpen,
+    setCheckoutOpen,
+    checkoutInitialMethod,
+    showHistory,
+    setShowHistory,
+    showLogout,
+    setShowLogout,
+    overrideRequest,
+    setOverrideRequest,
+    showShiftClose,
+    setShowShiftClose,
     handleCheckout,
     handlePaymentComplete,
     handleSendToKitchenOrSaveTab,
-    switchTable,
-    navigate,
-    printer,
-    setOverrideRequest,
-    overrideRequest,
-    showShiftClose,
-    setShowShiftClose,
-    tableNoState: tableNo,
-    cartCount,
-    theme,
-    tables,
-    tablesEnabled,
-    activeStaff,
-    staff,
-    transactions,
-    setActiveStaff,
-    businessConfig,
-    restaurantName,
-    taxConfig,
-    posConfig,
-    menuUrl,
-    loyaltyConfig,
   }
 }

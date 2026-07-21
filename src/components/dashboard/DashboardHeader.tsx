@@ -1,24 +1,24 @@
 import React from "react"
-import { History, Printer, Search, X } from "lucide-react"
+import { History, Printer, Search } from "lucide-react"
 
-type Props = {
+interface DashboardHeaderProps {
+  theme: "dark" | "light"
   activeStaffName?: string
-  theme?: string
-  hasLastReceipt?: boolean
-  onLogout: () => void
-  onShowHistory: () => void
-  onPrint: () => void
-  onShowSearch: () => void
+  hasLastTransaction: boolean
+  onLogoutClick: () => void
+  onHistoryClick: () => void
+  onPrintClick: () => void
+  onSearchClick: () => void
 }
 
-export const DashboardHeader: React.FC<Props> = ({
-  activeStaffName,
+export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   theme,
-  hasLastReceipt,
-  onLogout,
-  onShowHistory,
-  onPrint,
-  onShowSearch,
+  activeStaffName,
+  hasLastTransaction,
+  onLogoutClick,
+  onHistoryClick,
+  onPrintClick,
+  onSearchClick,
 }) => {
   return (
     <header
@@ -29,15 +29,16 @@ export const DashboardHeader: React.FC<Props> = ({
       }`}
     >
       <button
-        onClick={onLogout}
+        onClick={onLogoutClick}
         className="font-medium text-[#ff453a] transition-opacity hover:opacity-80"
       >
         Log out
       </button>
-
       <div className="flex flex-col items-center">
         <div
-          className={`flex items-center gap-2 ${theme === "dark" ? "text-white" : "text-[#111827]"}`}
+          className={`flex items-center gap-2 ${
+            theme === "dark" ? "text-white" : "text-[#111827]"
+          }`}
         >
           <span className="text-[17px] font-semibold">
             {activeStaffName || "Manager"}
@@ -47,40 +48,43 @@ export const DashboardHeader: React.FC<Props> = ({
           </svg>
         </div>
       </div>
-
       <div className="flex items-center gap-4">
         <button
-          onClick={onShowHistory}
+          onClick={onHistoryClick}
           className="rounded-full p-2 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
           title="Transaction History"
         >
           <History
-            className={`h-7 w-7 ${theme === "dark" ? "text-white" : "text-[#374151]"}`}
+            className={`h-7 w-7 ${
+              theme === "dark" ? "text-white" : "text-[#374151]"
+            }`}
           />
         </button>
-        {hasLastReceipt && (
+        {hasLastTransaction && (
           <button
-            onClick={onPrint}
+            onClick={onPrintClick}
             className="rounded-full p-2 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
             title="Print Last Receipt"
           >
             <Printer
-              className={`h-7 w-7 ${theme === "dark" ? "text-white" : "text-[#374151]"}`}
+              className={`h-7 w-7 ${
+                theme === "dark" ? "text-white" : "text-[#374151]"
+              }`}
             />
           </button>
         )}
         <button
-          onClick={onShowSearch}
+          onClick={onSearchClick}
           className="rounded-full p-2 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
           title="Search"
         >
           <Search
-            className={`h-7 w-7 ${theme === "dark" ? "text-white" : "text-[#374151]"}`}
+            className={`h-7 w-7 ${
+              theme === "dark" ? "text-white" : "text-[#374151]"
+            }`}
           />
         </button>
       </div>
     </header>
   )
 }
-
-export default DashboardHeader
