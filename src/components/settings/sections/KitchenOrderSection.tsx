@@ -1,9 +1,12 @@
 import React, { useState } from "react"
 import { toast } from "sonner"
-import { Button, Input, colors } from "../../ds"
-import { Card, SaveBar, SectionLabel, ToggleRow } from "../common"
+import { Button } from "../../ds/Button"
+import { Input } from "../../ds/Input"
+import { colors } from "../../ds/tokens"
+import { Card, SaveBar, ToggleRow } from "../common"
 import { useAppStore } from "../../../store/AppContext"
 import { settingsAPI } from "../../../services/api"
+import { SectionLabel } from "@/components/SectionLabel"
 
 export function KitchenOrderSection() {
   const { kotEnabled, setKotEnabled, stations, addStation, deleteStation } =

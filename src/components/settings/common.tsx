@@ -1,5 +1,8 @@
 import React from "react"
-import { Button, Input, colors, font, radius, shadows } from "../ds"
+
+import { Button } from "../ds/Button"
+import { Input } from "../ds/Input"
+import { colors, font, radius, shadows } from "../ds/tokens"
 
 export const INTER = "'Inter', sans-serif"
 export const NGN = "₦"
@@ -89,30 +92,6 @@ export function ToggleRow({
       </div>
       <Toggle checked={checked} onChange={onChange} disabled={disabled} />
     </div>
-  )
-}
-
-export function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      style={{
-        fontFamily: INTER,
-        fontWeight: 600,
-        fontSize: font.size.base,
-        color: colors.textPrimary,
-        marginTop: 4,
-      }}
-    >
-      {children}
-    </p>
-  )
-}
-
-export function Divider() {
-  return (
-    <div
-      style={{ borderTop: `1px solid ${colors.borderLight}`, margin: "4px 0" }}
-    />
   )
 }
 

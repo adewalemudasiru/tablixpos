@@ -1,19 +1,13 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useAppStore } from "../../../store/AppContext"
 import { settingsAPI } from "../../../services/api"
-import {
-  Card,
-  Divider,
-  FormSelect,
-  SaveBar,
-  SectionLabel,
-  Toggle,
-  ToggleRow,
-} from "../common"
+import { Card, SaveBar, Toggle, ToggleRow } from "../common"
 import type { TaxSettings } from "../../../types/settings/tax"
 import type { TaxConfig } from "../../../store/AppContext"
-import { colors, font, radius } from "../../ds"
+import { colors, radius } from "../../ds/tokens"
+import { SectionLabel } from "@/components/SectionLabel"
+import { Divider } from "@/components/Divider"
 
 const INIT_TAX: TaxSettings = {
   taxEnabled: true,

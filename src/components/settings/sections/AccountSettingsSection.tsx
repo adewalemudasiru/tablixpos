@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Button, Input, colors, font } from "../../ds"
-import { Card, Divider, SaveBar, SectionLabel, ToggleRow } from "../common"
+import { Button } from "../../ds/Button"
+import { Input } from "../../ds/Input"
+import { colors, font } from "../../ds/tokens"
+import { Card, ToggleRow } from "../common"
 import { useAppStore } from "../../../store/AppContext"
 import { accountAPI } from "../../../services/api"
+import { SectionLabel } from "@/components/SectionLabel"
+import { INTER } from "@/config/constants"
+import { Divider } from "@/components/Divider"
 
 export function AccountSettingsSection() {
   const { theme, setTheme } = useAppStore()
@@ -82,6 +87,7 @@ export function AccountSettingsSection() {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Profile */}
       <Card>
         <div className="flex flex-col gap-5">
           <SectionLabel>Owner Profile</SectionLabel>
@@ -116,6 +122,7 @@ export function AccountSettingsSection() {
 
       <Divider />
 
+      {/* App Preferences */}
       <Card>
         <div className="flex flex-col gap-5">
           <SectionLabel>App Preferences</SectionLabel>
@@ -130,13 +137,14 @@ export function AccountSettingsSection() {
 
       <Divider />
 
+      {/* Change PIN */}
       <Card>
         <div className="flex flex-col gap-5">
           <div>
             <SectionLabel>Change Login PIN</SectionLabel>
             <p
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: INTER,
                 fontSize: font.size.sm,
                 color: colors.textMuted,
                 marginTop: 2,

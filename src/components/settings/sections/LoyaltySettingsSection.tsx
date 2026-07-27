@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Input, colors, font } from "../../ds"
-import { Card, SaveBar, SectionLabel, ToggleRow } from "../common"
+import { Input } from "../../ds/Input"
+import { colors, font } from "../../ds/tokens"
+import { Card, SaveBar, ToggleRow } from "../common"
 import { useAppStore } from "../../../store/AppContext"
 import { settingsAPI } from "../../../services/api"
 import type { LoyaltySettings } from "../../../types/settings/loyalty"
+import { SectionLabel } from "@/components/SectionLabel"
 
 const INIT_LOYALTY: LoyaltySettings = {
   enabled: true,

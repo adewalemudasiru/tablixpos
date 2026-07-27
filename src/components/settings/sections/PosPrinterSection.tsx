@@ -2,15 +2,9 @@ import React, { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { useAppStore } from "../../../store/AppContext"
 import { settingsAPI } from "../../../services/api"
-import {
-  Card,
-  FormSelect,
-  FormTextarea,
-  SaveBar,
-  SectionLabel,
-  ToggleRow,
-} from "../common"
+import { Card, FormSelect, FormTextarea, SaveBar, ToggleRow } from "../common"
 import type { POSSettings } from "../../../types/settings/pos"
+import { SectionLabel } from "@/components/SectionLabel"
 
 const INIT_POS: POSSettings = {
   receiptHeader:
