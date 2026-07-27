@@ -1,6 +1,6 @@
 import { colors, font } from "../ds/tokens"
 import { Button } from "../ds/Button"
-import { AppLogo } from "../AppSidebar"
+import { AppLogo } from "../AppLogo"
 import { NavMenu } from "../NavMenu"
 import { AppSidebar, MobileBottomNav } from "../AppSidebar"
 import { LogoutConfirmationModal } from "../LogoutConfirmationModal"

@@ -1,5 +1,5 @@
 import { Button } from "../ds/Button"
-import { AppLogo } from "../AppSidebar"
+import { AppLogo } from "../AppLogo"
 import { NavMenu } from "../NavMenu"
 import { colors } from "../ds/tokens"
 

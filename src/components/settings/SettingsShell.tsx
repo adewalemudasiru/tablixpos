@@ -1,9 +1,10 @@
 import React from "react"
 import { LogoutConfirmationModal } from "../LogoutConfirmationModal"
-import { AppSidebar, AppLogo, MobileBottomNav } from "../AppSidebar"
+import { AppSidebar, MobileBottomNav } from "../AppSidebar"
 import { NavMenu } from "../NavMenu"
 import { Toaster } from "sonner"
 import type { SettingsTab } from "../../types/settings/common"
+import { AppLogo } from "../AppLogo"
 
 interface SettingsShellProps {
   activeTab: SettingsTab

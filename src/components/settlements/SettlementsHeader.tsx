@@ -1,4 +1,4 @@
-import { AppLogo } from "../AppSidebar"
+import { AppLogo } from "../AppLogo"
 import { NavMenu } from "../NavMenu"
 
 export function SettlementsHeader() {

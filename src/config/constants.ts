@@ -25,3 +25,4 @@ export const AUTH_ROUTES = [
 ]
 
 export const INTER = "'Inter', sans-serif"
+export const NGN = "\u20a6"

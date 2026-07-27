@@ -1,4 +1,4 @@
-import { AppLogo } from "../AppSidebar"
+import { AppLogo } from "../AppLogo"
 import { Button } from "../ds/Button"
 import { NavMenu } from "../NavMenu"
 
