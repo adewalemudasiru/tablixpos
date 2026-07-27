@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { IconCheck } from "@tabler/icons-react"
 import { useBilling } from "../../hooks/useBilling"
 import { fmtAmount } from "../../utils/formatting"
-import { colors, shadows } from "../ds"
+import { colors, shadows } from "../ds/tokens"
 import type { BillingCycle } from "../../types/billing/billing"
 import { PLAN_FEATURES_PRO } from "../../types/billing/billing"
 

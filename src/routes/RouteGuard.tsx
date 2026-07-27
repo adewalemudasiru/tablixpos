@@ -13,7 +13,12 @@ export function RouteGuard({ children }: RouteGuardProps) {
   const permissions = usePermissions()
   const location = useLocation()
 
-  if (!activeStaff) return <>{children}</>
+  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname)
+
+  if (!activeStaff) {
+    if (isPublicRoute) return <>{children}</>
+    return <Navigate to="/login" replace />
+  }
 
   // If the user's role is locked (like Admin), they have full access.
   const role =
@@ -22,7 +27,7 @@ export function RouteGuard({ children }: RouteGuardProps) {
   if (role?.isLocked && role?.name.includes("Admin")) return <>{children}</>
 
   // Always allow public / auth routes
-  if (PUBLIC_ROUTES.includes(location.pathname)) return <>{children}</>
+  if (isPublicRoute) return <>{children}</>
 
   let allowed: string[] = []
   if (permissions.includes("pos_access"))

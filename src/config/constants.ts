@@ -5,6 +5,8 @@ export const PUBLIC_ROUTES = [
   "/enter-pin",
   "/forgot-password",
   "/menu-view",
+  "/login",
+  "/signup",
 ]
 
 // Routes that indicate the user has just logged in and app data should be initialised

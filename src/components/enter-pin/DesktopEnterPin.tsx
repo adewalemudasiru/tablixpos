@@ -46,9 +46,16 @@ export function DesktopEnterPin() {
 
           <PinSwitchLink
             isStaffFlow={isStaffFlow}
-            onSwitch={() =>
-              navigate("/enter-pin", { state: { flow: "staff" } })
-            }
+            onSwitch={() => {
+              if (isStaffFlow) {
+                navigate("/login", { replace: true })
+              } else {
+                navigate("/enter-pin", {
+                  state: { flow: "staff" },
+                  replace: true,
+                })
+              }
+            }}
             className="mt-1"
           />
         </div>

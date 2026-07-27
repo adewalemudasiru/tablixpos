@@ -22,10 +22,12 @@ export function fmtAmt(n: number): string {
   return `${NGN}${n.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-export function fmtStat(n: number): string {
-  if (n >= 1000000) return `${NGN}${(n / 1000000).toFixed(1)}M`
-  if (n >= 1000) return `${NGN}${(n / 1000).toFixed(0)}K`
-  return `${NGN}${n.toLocaleString()}`
+export function fmtStat(n: number | null | undefined): string {
+  const safeValue = typeof n === "number" && Number.isFinite(n) ? n : 0
+
+  if (safeValue >= 1000000) return `${NGN}${(safeValue / 1000000).toFixed(1)}M`
+  if (safeValue >= 1000) return `${NGN}${(safeValue / 1000).toFixed(0)}K`
+  return `${NGN}${safeValue.toLocaleString("en-NG")}`
 }
 
 export function getPaymentIcon(color: string): string {

@@ -4,6 +4,8 @@ import { Routes, Route, Navigate } from "react-router"
 import OtpPage from "../pages/OtpPage"
 import CreatePinPage from "../pages/CreatePinPage"
 import EnterPinPage from "../pages/EnterPinPage"
+import LoginPage from "../pages/LoginPage"
+import SignupPage from "../pages/SignupPage"
 import DashboardPage from "../pages/DashboardPage"
 import ReportsPage from "../pages/ReportsPage"
 import InventoryPage from "../pages/InventoryPage"
@@ -29,8 +31,8 @@ export function AppRoutes() {
       <TrialBanner />
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/signup" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/otp" element={<OtpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/create-pin" element={<CreatePinPage />} />

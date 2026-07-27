@@ -30,6 +30,7 @@ import { MobilePagination } from "@/components/customer/MobilePagination"
 import { colors } from "../components/ds/tokens"
 import { font, shadows } from "../components/ds"
 import { fmt } from "@/utils/customer-helpers"
+import { mockApiCustomers } from "@/mock-data/customer"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -88,8 +89,13 @@ export default function CustomerPage({
     setError(null)
     try {
       const res = await customersAPI.list()
-      setCustomers(res.data.customers.map(mapApiCustomer))
+      const apiCustomers = res.data.customers ?? []
+      setCustomers([
+        ...mockApiCustomers.map(mapApiCustomer),
+        ...apiCustomers.map(mapApiCustomer),
+      ])
     } catch (e: any) {
+      setCustomers(mockApiCustomers.map(mapApiCustomer))
       setError(e?.data?.message ?? "Failed to load customers.")
     } finally {
       setLoading(false)

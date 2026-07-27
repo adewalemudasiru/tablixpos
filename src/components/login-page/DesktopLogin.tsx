@@ -2,7 +2,8 @@ import React, { useState } from "react"
 import { useNavigate } from "react-router"
 import { AuthLayout } from "../../components/AuthLayout"
 import { TablixLogo } from "../../components/TablixLogo"
-import { authAPI, businessAPI } from "../../services/api"
+import { authAPI } from "../../services/api"
+import { useAppStore } from "../../store/AppContext"
 import { addActivityEntry } from "../../services/activityLog"
 import { motion, AnimatePresence } from "motion/react"
 import { IconEye, IconKey, IconMail } from "@tabler/icons-react"
@@ -13,6 +14,7 @@ const INTER = "'Inter', sans-serif"
 
 export function DesktopLogin() {
   const navigate = useNavigate()
+  const { setActiveStaff } = useAppStore()
   const [email, setEmail] = useState("")
   const [pin, setPin] = useState("")
   const [showPin, setShowPin] = useState(false)
@@ -41,12 +43,19 @@ export function DesktopLogin() {
         localStorage.setItem("tablixpos_refresh_token", res.data.refreshToken)
         localStorage.setItem("tablix_owner_email", email.trim())
         localStorage.setItem("tablix_owner_pin", pin)
-        try {
-          const biz = await businessAPI.getProfile()
-          if (biz.data.business.id) {
-            localStorage.setItem("tablix_business_id", biz.data.business.id)
-          }
-        } catch (_) {}
+        localStorage.setItem("tablix_business_id", "mock-business-id")
+        localStorage.setItem(
+          "tablix_restaurant_name",
+          res.data?.user?.businessName || "Tablix Demo Restaurant"
+        )
+        setActiveStaff({
+          id: res.data?.user?.id || "mock-admin-001",
+          name: res.data?.user?.ownerName || "Owner",
+          email: res.data?.user?.email || email.trim(),
+          role: "Admin",
+          pin: pin,
+          dateCreated: new Date().toISOString(),
+        })
         addActivityEntry({
           staffName: "Owner",
           role: "Owner",

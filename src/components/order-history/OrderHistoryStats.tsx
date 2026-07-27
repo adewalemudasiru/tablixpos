@@ -88,7 +88,7 @@ const STAT_CONFIG = [
     icon: STAT_ICONS.totalOrders,
   },
   {
-    key: "revenue",
+    key: "totalRevenue",
     label: "Revenue",
     accent: "#e91835",
     bg: "#fff1f2",
@@ -124,9 +124,12 @@ export function OrderHistoryStats({
   const cardData = STAT_CONFIG.map((config) => ({
     ...config,
     value:
-      config.key === "revenue" || config.key === "avgOrder"
-        ? fmtStat(stats[config.key as keyof OrderHistoryStats] as number)
-        : String(stats[config.key as keyof OrderHistoryStats]),
+      config.key === "totalRevenue" || config.key === "avgOrder"
+        ? fmtStat(
+            stats[config.key as keyof OrderHistoryStats] as
+              number | null | undefined
+          )
+        : String(stats[config.key as keyof OrderHistoryStats] ?? 0),
   }))
 
   if (isEmbedded) return null

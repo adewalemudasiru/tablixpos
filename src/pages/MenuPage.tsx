@@ -244,7 +244,6 @@ export default function MenuPage() {
   return (
     <div className="page-bg flex h-screen flex-col overflow-hidden text-foreground">
       <MenuHeader />
-
       {/* Body */}
       <div className="page-border flex min-h-0 flex-1 overflow-hidden border-t">
         <AppSidebar
@@ -470,7 +469,6 @@ export default function MenuPage() {
           </div>
         </main>
       </div>
-
       {/* Modals */}
       <MenuModal
         open={showModal}
@@ -483,7 +481,6 @@ export default function MenuPage() {
         editItem={editItem}
         inventoryItems={localInventory}
       />
-
       <ConfirmModal
         open={!!deleteItem}
         onClose={() => setDeleteItem(null)}
@@ -494,7 +491,6 @@ export default function MenuPage() {
         cancelLabel="Cancel"
         variant="danger"
       />
-
       <CategoryModal
         open={showCatModal}
         onClose={() => {
@@ -504,16 +500,13 @@ export default function MenuPage() {
         onSave={handleSaveCategory}
         editCategory={editCategory}
       />
-
       {showLogout && (
         <LogoutConfirmationModal
           isOpen={showLogout}
           onCancel={() => setShowLogout(false)}
         />
       )}
-
       <MobileBottomNav activeId="menu" onLogout={() => setShowLogout(true)} />
-
       {/* Sheets */}
       <MenuItemDetailSheet
         item={sheetItem}
@@ -528,7 +521,6 @@ export default function MenuPage() {
         }}
         onToggle={handleToggleItem}
       />
-
       <CategoryDetailSheet
         category={sheetCat}
         items={items}
@@ -543,7 +535,6 @@ export default function MenuPage() {
         }}
         onToggle={handleToggleCategory}
       />
-
       <ImportExportSheet
         open={showImportExport}
         onClose={() => setShowImportExport(false)}

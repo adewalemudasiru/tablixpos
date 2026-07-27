@@ -26,6 +26,7 @@ import type {
   TxStatus,
   DateRange,
 } from "../types/order-history/order"
+import { mockApiOrders } from "@/mock-data/order"
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -73,10 +74,15 @@ export default function OrderHistoryPage({
   const permissions = usePermissions()
   const isCashier = !permissions.includes("manager_override")
 
+  const effectiveApiOrders = useMemo(
+    () => [...mockApiOrders, ...apiOrders],
+    [apiOrders]
+  )
+
   // Map API orders → OrderRow
   const allOrders: OrderRow[] = useMemo(
     () =>
-      apiOrders.map((o) => {
+      effectiveApiOrders.map((o) => {
         const d = new Date(o.createdAt)
         const datetime =
           d.toLocaleDateString("en-US", {
@@ -90,16 +96,19 @@ export default function OrderHistoryPage({
             minute: "2-digit",
             hour12: false,
           })
-        const txStatus: TxStatus =
-          o.status === "Cancelled"
-            ? "voided"
-            : o.paymentStatus === "Completed"
-              ? "completed"
-              : "completed"
         let parsedNotes: any = {}
         try {
           parsedNotes = JSON.parse(o.notes || "{}")
         } catch (e) {}
+
+        const txStatus: TxStatus =
+          parsedNotes.mockStatus === "refunded"
+            ? "refunded"
+            : parsedNotes.mockStatus === "voided" || o.status === "Cancelled"
+              ? "voided"
+              : o.paymentStatus === "Completed"
+                ? "completed"
+                : "completed"
 
         const pMethod =
           parsedNotes.paymentMethod ||
@@ -138,7 +147,7 @@ export default function OrderHistoryPage({
           } as Transaction,
         }
       }),
-    [apiOrders]
+    [effectiveApiOrders]
   )
 
   const filteredByDate = useMemo(() => {

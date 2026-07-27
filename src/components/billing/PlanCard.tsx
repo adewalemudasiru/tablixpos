@@ -1,7 +1,7 @@
 import { checkTrialExpired } from "../../store/AppContext"
 import { useBilling } from "../../hooks/useBilling"
 import { fmtAmount, fmtDate } from "../../utils/formatting"
-import { shadows, colors } from "../ds"
+import { shadows, colors } from "../ds/tokens"
 
 const INTER = "'Inter', sans-serif"
 const RED = "#e91835"

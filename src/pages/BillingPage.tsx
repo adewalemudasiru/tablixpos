@@ -70,7 +70,6 @@ export default function BillingPage() {
           )}
         </div>
       </header>
-
       {/* Body */}
       <div className="page-border flex min-h-0 flex-1 overflow-hidden border-t">
         <AppSidebar
@@ -149,7 +148,6 @@ export default function BillingPage() {
           </div>
         </main>
       </div>
-
       {/* Modals */}
       <CancelModal
         open={showCancel}
@@ -162,7 +160,6 @@ export default function BillingPage() {
         onClose={() => setShowSubscribe(false)}
         onSuccess={handlePaymentSuccess}
       />
-
       <MobileBottomNav
         activeId="billing"
         onLogout={() => setShowLogout(true)}

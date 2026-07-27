@@ -44,7 +44,16 @@ export function MobileEnterPin() {
 
         <PinSwitchLink
           isStaffFlow={isStaffFlow}
-          onSwitch={() => navigate("/login")}
+          onSwitch={() => {
+            if (isStaffFlow) {
+              navigate("/login", { replace: true })
+            } else {
+              navigate("/enter-pin", {
+                state: { flow: "staff" },
+                replace: true,
+              })
+            }
+          }}
         />
       </PinCard>
     </PinBackground>

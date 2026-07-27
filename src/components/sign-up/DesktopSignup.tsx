@@ -11,6 +11,7 @@ import { BUSINESS_TYPES, NIGERIA_STATES, STATE_LIST } from "@/constants/sign-up"
 import { motion, AnimatePresence } from "motion/react"
 import { AuthLayout } from "../AuthLayout"
 import { TablixLogo } from "../TablixLogo"
+import { useAppStore } from "../../store/AppContext"
 
 const INTER = "'Inter', sans-serif"
 
@@ -59,18 +60,21 @@ export function DesktopSignup({
     setSubmitError("")
     setLoading(true)
     try {
-      await authAPI.signup({
+      const res = await authAPI.signup({
         businessName: payload.businessName,
         businessType: payload.businessType,
         ownerName: payload.ownerName,
         email: payload.email,
         phone: payload.phone,
       })
+
       try {
         sessionStorage.setItem("tablix_temp_reg", JSON.stringify(payload))
       } catch (_) {}
-      navigate("/otp", {
-        state: { email: form.email, flow: "signup", form: payload },
+
+      navigate("/create-pin", {
+        replace: true,
+        state: { form: payload, email: payload.email },
       })
     } catch (err: any) {
       const msg =
@@ -464,7 +468,7 @@ export function DesktopSignup({
         >
           Already have a Tablix account?{" "}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/login")}
             style={{
               fontFamily: INTER,
               fontWeight: 700,
