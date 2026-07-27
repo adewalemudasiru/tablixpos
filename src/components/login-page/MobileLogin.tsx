@@ -18,7 +18,7 @@ export function MobileLogin() {
   const [error, setError] = useState("")
 
   const handlePinChange = (val: string) => {
-    const clean = val.replace(/\D/g, "") // accept only digits
+    const clean = val.replace(/\D/g, "") // accept only digits for login PIN
     if (clean.length <= 6) {
       setPin(clean)
       setError("")
