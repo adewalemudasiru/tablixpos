@@ -64,9 +64,12 @@ export default function ReportsPage() {
   } = useReportsData(range)
 
   // Recent Orders
+  console.debug("[ReportsPage] apiOrders:", apiOrders)
+  const safeApiOrders = apiOrders ?? []
+
   const recentOrders: OrderRow[] = useMemo(
     () =>
-      apiOrders.slice(0, 20).map((o) => {
+      safeApiOrders.slice(0, 20).map((o) => {
         const d = new Date(o.createdAt)
         let parsedNotes: any = {}
         try {

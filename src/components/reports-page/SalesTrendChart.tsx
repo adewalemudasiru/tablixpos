@@ -27,12 +27,13 @@ export function SalesTrendChart({
   data: any[]
 }) {
   const [metric, setMetric] = useState<"revenue" | "orders">("revenue")
+  const safeData = Array.isArray(data) ? data : []
   const xKey =
     range === "Today"
       ? "hour"
       : range === "Year"
         ? "label"
-        : data[0] && "day" in data[0]
+        : safeData[0] && "day" in safeData[0]
           ? "day"
           : "label"
   return (
@@ -97,7 +98,7 @@ export function SalesTrendChart({
       <div style={{ height: 220 }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={data}
+            data={safeData}
             margin={{ top: 4, right: 4, bottom: 0, left: 0 }}
           >
             <defs>

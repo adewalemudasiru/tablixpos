@@ -1,4 +1,5 @@
-import { Cell, Pie, ResponsiveContainer, Tooltip } from "recharts"
+import { Pie, ResponsiveContainer, Sector, Tooltip } from "recharts"
+import type { PieSectorShapeProps } from "recharts"
 import { colors } from "../ds/tokens"
 import { PieChart } from "lucide-react"
 import { fmtK } from "@/utils/report-helpers"
@@ -7,6 +8,13 @@ const CARD =
   "page-card rounded-2xl border page-border shadow-[0_1px_4px_0_rgba(0,0,0,0.06),0_4px_16px_0_rgba(0,0,0,0.04)]"
 
 const INTER = "'Inter', sans-serif"
+
+// Replaces Cell: reads the color straight off each slice's payload
+const PaymentSlice = (props: PieSectorShapeProps) => {
+  const fill =
+    (props.payload as { color?: string } | undefined)?.color ?? "#e5e7eb"
+  return <Sector {...props} fill={fill} />
+}
 
 export function PaymentDistribution({
   payData,
@@ -54,11 +62,8 @@ export function PaymentDistribution({
                 outerRadius={60}
                 paddingAngle={3}
                 dataKey="value"
-              >
-                {display.map((p, i) => (
-                  <Cell key={`cell-${i}`} fill={p.color} />
-                ))}
-              </Pie>
+                shape={PaymentSlice}
+              />
               <Tooltip
                 formatter={(v: any) => fmtK(Number(v ?? 0))}
                 contentStyle={{

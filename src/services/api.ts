@@ -1,7 +1,10 @@
 import { idbEnqueueRequest } from "./idb"
 import { createMockUser, findMockUser } from "../mock-data/auth"
+import { handleMockRequest } from "./mockApi"
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api/v1"
+const USE_MOCK_API =
+  !import.meta.env.VITE_API_BASE_URL || API_BASE_URL.includes("localhost")
 
 interface AuthResponse {
   success: boolean
@@ -69,16 +72,23 @@ async function apiCall<T>(
 
   let response: Response
   try {
-    if (
-      !navigator.onLine &&
-      ["POST", "PUT", "PATCH", "DELETE"].includes(options.method || "GET")
-    ) {
-      throw new TypeError("Failed to fetch") // Simulate network error
+    if (USE_MOCK_API) {
+      response = await handleMockRequest(url, {
+        ...options,
+        headers,
+      })
+    } else {
+      if (
+        !navigator.onLine &&
+        ["POST", "PUT", "PATCH", "DELETE"].includes(options.method || "GET")
+      ) {
+        throw new TypeError("Failed to fetch") // Simulate network error
+      }
+      response = await fetch(url, {
+        ...options,
+        headers,
+      })
     }
-    response = await fetch(url, {
-      ...options,
-      headers,
-    })
   } catch (err: any) {
     if (err.name === "TypeError" || err.message === "Failed to fetch") {
       const method = (options.method || "GET").toUpperCase()
