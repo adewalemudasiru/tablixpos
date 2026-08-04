@@ -3,6 +3,7 @@ export type SettingsTab =
   | "Account Settings"
   | "Loyalty Reward"
   | "POS & Printer"
+  | "Printer Test"
   | "Kitchen Order"
   | "Table Management"
   | "Tax Settings"

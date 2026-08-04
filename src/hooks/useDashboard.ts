@@ -517,7 +517,14 @@ export function useDashboard() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [cart, activeCategory, search, checkoutOpen, products, clearCartForActiveTable])
+  }, [
+    cart,
+    activeCategory,
+    search,
+    checkoutOpen,
+    products,
+    clearCartForActiveTable,
+  ])
 
   const cartSubtotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
   const cartDiscountAmount =

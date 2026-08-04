@@ -1,8 +1,25 @@
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import type { ReceiptData } from "../services/printer"
+
+declare global {
+  interface Window {
+    electronAPI?: {
+      getPrinters: () => Promise<string[]>
+      print: (options?: Record<string, unknown>) => Promise<{
+        success: boolean
+        failureReason?: string
+      }>
+      openExternal: (url: string) => Promise<void>
+    }
+  }
+}
 
 export function usePrinter() {
   const [noPrinter, setNoPrinter] = useState(false)
+  const hasElectron = useMemo(
+    () => typeof window !== "undefined" && !!window.electronAPI,
+    []
+  )
 
   const printViaBrowser = useCallback(async (receiptData: ReceiptData) => {
     try {
@@ -69,14 +86,42 @@ export function usePrinter() {
     }
   }, [])
 
+  const getPrinters = useCallback(async () => {
+    if (!hasElectron) return []
+    try {
+      return await window.electronAPI!.getPrinters()
+    } catch {
+      return []
+    }
+  }, [hasElectron])
+
+  const printViaElectron = useCallback(async () => {
+    if (!hasElectron) return false
+    try {
+      const result = await window.electronAPI!.print({
+        silent: false,
+        printBackground: true,
+      })
+      return result.success
+    } catch {
+      return false
+    }
+  }, [hasElectron])
+
   const print = useCallback(
     async (receiptData: ReceiptData) => {
       if (noPrinter) {
         return "browser"
       }
+
+      if (hasElectron) {
+        const success = await printViaElectron()
+        if (success) return "electron"
+      }
+
       return printViaBrowser(receiptData)
     },
-    [noPrinter, printViaBrowser]
+    [hasElectron, noPrinter, printViaBrowser, printViaElectron]
   )
 
   return {
@@ -84,5 +129,8 @@ export function usePrinter() {
     setNoPrinter,
     print,
     printViaBrowser,
+    getPrinters,
+    printViaElectron,
+    hasElectron,
   }
 }
