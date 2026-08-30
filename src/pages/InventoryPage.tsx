@@ -1,5 +1,5 @@
 // InventoryPage.tsx
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { DataTable } from "../components/ds/DataTable"
 import { ConfirmModal } from "../components/ds/Modal"
 import { Toaster } from "sonner"
@@ -72,6 +72,15 @@ export default function InventoryPage() {
   const [editItem, setEditItem] = useState<InventoryItem | null>(null)
   const [deleteItem, setDeleteItem] = useState<InventoryItem | null>(null)
   const [restockItem, setRestockItem] = useState<InventoryItem | null>(null)
+
+  useEffect(() => {
+    const handleOpenInventoryAdd = () => setShowAddItem(true)
+    window.addEventListener("open-inventory-add", handleOpenInventoryAdd)
+
+    return () => {
+      window.removeEventListener("open-inventory-add", handleOpenInventoryAdd)
+    }
+  }, [])
 
   // Supplier state
   const [showAddSupplier, setShowAddSupplier] = useState(false)
@@ -294,7 +303,7 @@ export default function InventoryPage() {
       <Toaster position="top-center" richColors />
 
       <div className="page-border flex min-h-0 flex-1 overflow-hidden border-t">
-        <main className="page-surface flex-1 overflow-y-auto pb-[72px] md:pb-0">
+        <main className="page-surface flex-1 overflow-y-auto pb-18 md:pb-0">
           <div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
             {/* Page Title */}
             <div className="flex items-start justify-between">

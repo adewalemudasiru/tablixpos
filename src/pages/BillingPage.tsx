@@ -28,7 +28,7 @@ export default function BillingPage() {
 
       {/* Body */}
       <div className="page-border flex min-h-0 flex-1 overflow-hidden border-t">
-        <main className="page-surface flex-1 overflow-y-auto pb-[80px] md:pb-6">
+        <main className="page-surface flex-1 overflow-y-auto pb-20 md:pb-6">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 md:gap-6">
             {/* Desktop heading */}
             <div className="hidden px-6 pt-8 md:block">

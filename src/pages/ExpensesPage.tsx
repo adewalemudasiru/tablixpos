@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ConfirmModal } from "../components/ds/Modal"
 import { Toaster } from "sonner"
 import { useAppStore, type Expense } from "../store/AppContext"
@@ -43,6 +43,15 @@ export default function ExpensesPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [editExpense, setEditExpense] = useState<Expense | null>(null)
   const [deleteExp, setDeleteExp] = useState<Expense | null>(null)
+
+  useEffect(() => {
+    const handleOpenExpenseAdd = () => setShowAddModal(true)
+    window.addEventListener("open-expense-add", handleOpenExpenseAdd)
+
+    return () => {
+      window.removeEventListener("open-expense-add", handleOpenExpenseAdd)
+    }
+  }, [])
 
   const STAT_CARDS = [
     {
@@ -254,7 +263,7 @@ export default function ExpensesPage() {
       <Toaster position="top-center" richColors />
 
       <div className="page-border flex min-h-0 flex-1 overflow-hidden border-t">
-        <main className="page-surface flex-1 overflow-y-auto pb-[72px] md:pb-0">
+        <main className="page-surface flex-1 overflow-y-auto pb-18 md:pb-0">
           <div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
             {/* Heading */}
             <div className="flex items-start justify-between">

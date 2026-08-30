@@ -1,5 +1,5 @@
 // CustomerPage.tsx
-import React, { useState, useMemo, useEffect, useCallback } from "react"
+import { useState, useMemo, useEffect, useCallback } from "react"
 import { useAppStore } from "../store/AppContext"
 import type { StoreCustomer as Customer } from "../store/AppContext"
 import { customersAPI } from "../services/api"
@@ -17,7 +17,6 @@ import { Pagination } from "@/components/customer/Pagination"
 import { CustomerModal } from "@/components/customer/CustomerModal"
 
 // New components
-import { CustomerHeader } from "@/components/customer/CustomerHeader"
 import { SearchModal } from "@/components/customer/SearchModal"
 import { ErrorBanner } from "@/components/customer/ErrorBanner"
 import { LoadingSpinner } from "@/components/customer/LoadingSpinner"
@@ -278,17 +277,6 @@ export default function CustomerPage({
     <>
       <Toaster position="top-center" richColors />
 
-      <CustomerHeader
-        isEmbedded={isEmbedded}
-        isDark={isDark}
-        onSearchClick={() => setShowSearchModal(true)}
-        onAddClick={() => {
-          setEditCustomer(null)
-          setShowModal(true)
-        }}
-        isReadOnly={isReadOnly}
-      />
-
       <SearchModal
         isOpen={showSearchModal}
         isDark={isDark}
@@ -308,7 +296,7 @@ export default function CustomerPage({
         )}
 
         {/* ── MOBILE layout ── */}
-        <div className="flex flex-1 flex-col overflow-hidden bg-[var(--page-surface)] md:hidden">
+        <div className="flex flex-1 flex-col overflow-hidden bg-(--page-surface) md:hidden">
           <MobileHeader
             isDark={isDark}
             onSearchClick={() => setShowSearchModal(true)}
@@ -330,7 +318,7 @@ export default function CustomerPage({
           {loading ? (
             <LoadingSpinner className="flex-1" />
           ) : (
-            <div className="flex-1 overflow-y-auto pb-[80px]">
+            <div className="flex-1 overflow-y-auto pb-20">
               {/* Stat cards */}
               <div
                 className="flex scrollbar-none gap-3 overflow-x-auto px-4 pt-4 pb-3"

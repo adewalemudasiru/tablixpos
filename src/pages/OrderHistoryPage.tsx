@@ -12,7 +12,6 @@ import type { ApiOrder } from "../services/api"
 import { ReceiptModal } from "../components/order-history/ReceiptModal"
 
 // Import all the new components
-import { OrderHistoryHeader } from "../components/order-history/OrderHistoryHeader"
 import { OrderHistoryFilters } from "../components/order-history/OrderHistoryFilters"
 import { OrderHistoryStats } from "../components/order-history/OrderHistoryStats"
 import { OrderSearchModal } from "../components/order-history/OrderSearchModal"
@@ -248,13 +247,6 @@ export default function OrderHistoryPage({
     <>
       <Toaster richColors position="top-right" />
 
-      <OrderHistoryHeader
-        isEmbedded={isEmbedded}
-        isDark={isDark}
-        onSearchClick={() => setShowSearchModal(true)}
-        onExportClick={handleExportCSV}
-      />
-
       {/* Search Modal */}
       <OrderSearchModal
         isOpen={showSearchModal}
@@ -276,7 +268,7 @@ export default function OrderHistoryPage({
         )}
 
         <main
-          className={`flex-1 overflow-y-auto pb-[72px] md:pb-0 ${
+          className={`flex-1 overflow-y-auto pb-18 md:pb-0 ${
             isEmbedded ? (isDark ? "bg-[#1c1c1e]" : "bg-[#f4f4f6]") : ""
           }`}
           style={isEmbedded ? {} : { background: "var(--page-surface)" }}
