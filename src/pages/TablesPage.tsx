@@ -7,7 +7,6 @@ import { AnimatePresence } from "motion/react"
 import { TableDetailModal } from "@/components/tables-page/TableDetailModal"
 
 // Import new components
-import { TablesHeader } from "../components/tables-page/TablesHeader"
 import { TablesDisabled } from "../components/tables-page/TablesDisabled"
 import { TablesZoneTabs } from "../components/tables-page/TablesZoneTabs"
 import { TablesFilters } from "../components/tables-page/TablesFilters"
@@ -69,7 +68,6 @@ export default function TablesPage({
   const content = (
     <>
       <Toaster richColors position="top-right" />
-      <TablesHeader isEmbedded={isEmbedded} isDark={isDark} />
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {!isEmbedded && (
@@ -82,7 +80,7 @@ export default function TablesPage({
         )}
 
         <main
-          className={`flex-1 overflow-y-auto pb-[72px] md:pb-0 ${
+          className={`flex-1 overflow-y-auto pb-18 md:pb-0 ${
             isEmbedded ? (isDark ? "bg-[#1c1c1e]" : "bg-[#f4f4f6]") : ""
           }`}
           style={isEmbedded ? {} : { background: "var(--page-surface)" }}
