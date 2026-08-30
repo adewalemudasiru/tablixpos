@@ -1,7 +1,5 @@
 import { useState, useMemo } from "react"
 import { useAppStore } from "../store/AppContext"
-import { LogoutConfirmationModal } from "../components/LogoutConfirmationModal"
-import { AppSidebar, MobileBottomNav } from "../components/AppSidebar"
 import { ReceiptModal } from "@/components/reports-page/ReceiptModal"
 import { StatCards } from "@/components/reports-page/StatCards"
 import { BestSellers } from "@/components/reports-page/BestSellers"
@@ -16,7 +14,6 @@ import { StationPrepTimeChart } from "@/components/reports-page/StationPrepTimeC
 import { PrepQualityChart } from "@/components/reports-page/PrepQualityChart"
 
 // Import new components
-import { ReportsHeader } from "../components/reports-page/ReportsHeader"
 import { ReportsFilters } from "../components/reports-page/ReportsFilters"
 import { RecentOrdersTable } from "../components/reports-page/RecentOrdersTable"
 import { KitchenPerformanceTable } from "../components/reports-page/KitchenPerformanceTable"
@@ -39,8 +36,6 @@ const NGN = "\u20a6"
 
 export default function ReportsPage() {
   const { kotEnabled } = useAppStore()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [showLogout, setShowLogout] = useState(false)
   const [range, setRange] = useState<Range>("Month")
   const [reportMode, setReportMode] = useState<ReportMode>("sales")
   const [selectedTx, setSelectedTx] = useState<any | null>(null)
@@ -134,16 +129,7 @@ export default function ReportsPage() {
       className="flex h-screen flex-col overflow-hidden"
       style={{ background: "var(--page-bg)" }}
     >
-      <ReportsHeader />
-
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <AppSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={() => setShowLogout(true)}
-          activeId="reports"
-        />
-
         <main
           className="flex-1 overflow-y-auto pb-[72px] md:pb-0"
           style={{ background: "var(--page-surface)" }}
@@ -264,15 +250,6 @@ export default function ReportsPage() {
         </main>
       </div>
 
-      <MobileBottomNav
-        activeId="reports"
-        onLogout={() => setShowLogout(true)}
-      />
-      <LogoutConfirmationModal
-        isOpen={showLogout}
-        onConfirm={() => setShowLogout(false)}
-        onCancel={() => setShowLogout(false)}
-      />
       <ReceiptModal
         open={!!selectedTx}
         tx={selectedTx}

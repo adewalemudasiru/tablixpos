@@ -38,7 +38,9 @@ export function RouteGuard({ children }: RouteGuardProps) {
   if (permissions.includes("view_reports")) allowed.push("/reports")
   if (permissions.includes("view_expenses")) allowed.push("/expenses")
   if (permissions.includes("manage_inventory")) allowed.push("/inventory")
-  if (permissions.includes("manage_settings")) allowed.push("/settings")
+  if (permissions.includes("manage_settings"))
+    allowed.push("/settings", "/account-settings")
+  if (permissions.includes("manager_override")) allowed.push("/settlements")
   if (permissions.includes("manage_tables")) allowed.push("/tables")
   if (permissions.includes("billing_access")) allowed.push("/billing")
 

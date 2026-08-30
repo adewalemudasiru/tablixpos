@@ -1,12 +1,9 @@
 import { useState } from "react"
 import { useAppStore, usePermissions } from "../store/AppContext"
-import { AppSidebar, MobileBottomNav } from "../components/AppSidebar"
 import { Toaster, toast } from "sonner"
-import { LogoutConfirmationModal } from "../components/LogoutConfirmationModal"
 import { AdjustmentDetailModal } from "@/components/settlements/AdjustmentDetailModal"
 
 // Import new components
-import { SettlementsHeader } from "../components/settlements/SettlementsHeader"
 import { SettlementsStats } from "../components/settlements/SettlementsStats"
 import { SettlementsFilters } from "../components/settlements/SettlementsFilters"
 import { SettlementsList } from "../components/settlements/SettlementsList"
@@ -20,8 +17,6 @@ export default function SettlementsPage() {
   const permissions = usePermissions()
   const canViewAll = permissions.includes("manager_override")
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [showLogout, setShowLogout] = useState(false)
   const [selectedTx, setSelectedTx] = useState<any | null>(null)
 
   const {
@@ -53,16 +48,7 @@ export default function SettlementsPage() {
     >
       <Toaster richColors position="top-right" />
 
-      <SettlementsHeader />
-
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <AppSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={() => setShowLogout(true)}
-          activeId="settlements"
-        />
-
         <main
           className="flex-1 overflow-y-auto pb-[72px] md:pb-0"
           style={{ background: "var(--page-surface)" }}
@@ -82,7 +68,9 @@ export default function SettlementsPage() {
             <SettlementsStats
               stats={{
                 ...stats,
-                uniqueApprovers: stats.uniqueApprovers.filter((s): s is string => !!s),
+                uniqueApprovers: stats.uniqueApprovers.filter(
+                  (s): s is string => !!s
+                ),
               }}
             />
 
@@ -101,17 +89,6 @@ export default function SettlementsPage() {
         tx={selectedTx}
         open={selectedTx !== null}
         onClose={() => setSelectedTx(null)}
-      />
-
-      <LogoutConfirmationModal
-        isOpen={showLogout}
-        onConfirm={() => setShowLogout(false)}
-        onCancel={() => setShowLogout(false)}
-      />
-
-      <MobileBottomNav
-        activeId="settlements"
-        onLogout={() => setShowLogout(true)}
       />
     </div>
   )

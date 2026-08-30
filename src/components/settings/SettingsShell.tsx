@@ -1,10 +1,6 @@
 import React from "react"
-import { LogoutConfirmationModal } from "../LogoutConfirmationModal"
-import { AppSidebar, MobileBottomNav } from "../AppSidebar"
-import { NavMenu } from "../NavMenu"
 import { Toaster } from "sonner"
 import type { SettingsTab } from "../../types/settings/common"
-import { AppLogo } from "../AppLogo"
 
 interface SettingsShellProps {
   activeTab: SettingsTab
@@ -21,36 +17,13 @@ export function SettingsShell({
   tabIcons,
   children,
 }: SettingsShellProps) {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false)
-  const [showLogout, setShowLogout] = React.useState(false)
-
   return (
     <div
       className="flex h-screen flex-col overflow-hidden"
       style={{ background: "var(--page-bg)" }}
     >
       <Toaster position="top-center" richColors />
-      <header
-        className="z-30 flex h-[69px] shrink-0 items-center justify-between border-b px-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.06)] md:px-6"
-        style={{
-          background: "var(--page-header-bg)",
-          borderColor: "var(--page-header-border)",
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <AppLogo />
-          <NavMenu />
-        </div>
-      </header>
-
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <AppSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={() => setShowLogout(true)}
-          activeId="settings"
-        />
-
         <main
           className="flex-1 overflow-y-auto pb-[72px] md:pb-0"
           style={{ background: "var(--page-surface)" }}
@@ -176,7 +149,7 @@ export function SettingsShell({
                   >
                     {activeTab === "Business Info" &&
                       "Your restaurant details and localisation settings"}
-                    {activeTab === "Account Settings" &&
+                    {activeTab === "Profile" &&
                       "Update your owner profile and change your login PIN"}
                     {activeTab === "Loyalty Reward" &&
                       "Configure your customer loyalty and rewards program"}
@@ -199,16 +172,6 @@ export function SettingsShell({
           </div>
         </main>
       </div>
-
-      <MobileBottomNav
-        activeId="settings"
-        onLogout={() => setShowLogout(true)}
-      />
-      <LogoutConfirmationModal
-        isOpen={showLogout}
-        onConfirm={() => setShowLogout(false)}
-        onCancel={() => setShowLogout(false)}
-      />
     </div>
   )
 }

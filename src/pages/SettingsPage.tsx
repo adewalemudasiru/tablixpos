@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react"
 import { SettingsShell } from "../components/settings/SettingsShell"
 import { BusinessInfoSection } from "../components/settings/sections/BusinessInfoSection"
-import { AccountSettingsSection } from "../components/settings/sections/AccountSettingsSection"
+
 import { LoyaltySettingsSection } from "../components/settings/sections/LoyaltySettingsSection"
 import { PosPrinterSection } from "../components/settings/sections/PosPrinterSection"
 import { PrinterTestSection } from "../components/settings/sections/PrinterTestSection"
@@ -10,10 +10,11 @@ import { TableManagementSection } from "../components/settings/sections/TableMan
 import { TaxSettingsSection } from "../components/settings/sections/TaxSettingsSection"
 import { MenuQRSection } from "../components/settings/sections/MenuQRSection"
 import type { SettingsTab } from "../types/settings/common"
+import { ProfileSection } from "@/components/settings/sections/AccountSettingsSection"
 
 const SETTINGS_TABS: SettingsTab[] = [
   "Business Info",
-  "Account Settings",
+  "Profile",
   "Loyalty Reward",
   "POS & Printer",
   "Printer Test",
@@ -42,7 +43,7 @@ const TAB_ICONS: Record<SettingsTab, React.ReactNode> = {
       />
     </svg>
   ),
-  "Account Settings": (
+  Profile: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
       <path
         d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"
@@ -226,13 +227,17 @@ const TAB_ICONS: Record<SettingsTab, React.ReactNode> = {
   ),
 }
 
-export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>("Business Info")
+export default function SettingsPage({
+  initialTab = "Business Info",
+}: {
+  initialTab?: SettingsTab
+}) {
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab)
 
   const content = useMemo(() => {
     switch (activeTab) {
-      case "Account Settings":
-        return <AccountSettingsSection />
+      case "Profile":
+        return <ProfileSection />
       case "Loyalty Reward":
         return <LoyaltySettingsSection />
       case "POS & Printer":

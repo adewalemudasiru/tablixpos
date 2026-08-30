@@ -10,7 +10,7 @@ import { SectionLabel } from "@/components/SectionLabel"
 import { INTER } from "@/config/constants"
 import { Divider } from "@/components/Divider"
 
-export function AccountSettingsSection() {
+export function ProfileSection() {
   const { theme, setTheme } = useAppStore()
   const [form, setForm] = useState({ ownerName: "", phone: "" })
   const [pinForm, setPinForm] = useState({

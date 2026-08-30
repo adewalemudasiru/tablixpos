@@ -1,12 +1,25 @@
 import { useState } from "react"
 import { MenuHeader } from "./MenuHeader"
 import { AppSidebar } from "./AppSidebar"
-import { Outlet } from "react-router"
+import { Outlet, useLocation } from "react-router"
 import { LogoutConfirmationModal } from "../LogoutConfirmationModal"
+import { MobileBottomNav } from "./MobileBottomNav"
 
 const SettingsLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [showLogout, setShowLogout] = useState(false)
+  const location = useLocation()
+  const activeId =
+    {
+      "/reports": "reports",
+      "/inventory": "inventory",
+      "/menu": "menu",
+      "/staff": "staff",
+      "/expenses": "expenses",
+      "/billing": "billing",
+      "/account-settings": "settings",
+      "/settlements": "settlements",
+    }[location.pathname] ?? "reports"
 
   return (
     <div className="page-bg flex h-screen flex-col overflow-hidden text-foreground">
@@ -17,10 +30,12 @@ const SettingsLayout = () => {
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           onLogout={() => setShowLogout(true)}
-          activeId="menu"
+          activeId={activeId}
         />
 
-        <Outlet />
+        <div className="page-surface flex flex-1 flex-col overflow-hidden">
+          <Outlet />
+        </div>
 
         {/* Logout confirmation modal */}
         {showLogout && (
@@ -30,6 +45,11 @@ const SettingsLayout = () => {
           />
         )}
       </div>
+
+      <MobileBottomNav
+        activeId={activeId}
+        onLogout={() => setShowLogout(true)}
+      />
     </div>
   )
 }
