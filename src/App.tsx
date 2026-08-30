@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router"
 import { AppErrorBoundary } from "./components/auth/AppErrorBoundary"
 import { MainApp } from "./MainApp"
 
+// build
+
 export default function App() {
   return (
     <AppErrorBoundary>
