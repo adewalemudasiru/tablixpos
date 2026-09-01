@@ -1,7 +1,5 @@
 // InventoryPage.tsx
-import { useState } from "react"
-import { LogoutConfirmationModal } from "../components/LogoutConfirmationModal"
-import { AppSidebar, MobileBottomNav } from "../components/AppSidebar"
+import { useEffect, useState } from "react"
 import { DataTable } from "../components/ds/DataTable"
 import { ConfirmModal } from "../components/ds/Modal"
 import { Toaster } from "sonner"
@@ -13,7 +11,6 @@ import {
 } from "../store/AppContext"
 
 // New components
-import { InventoryHeader } from "../components/inventory/InventoryHeader"
 import { LowStockAlerts } from "../components/inventory/LowStockAlerts"
 import { InventoryStats } from "../components/inventory/InventoryStats"
 import { TabBar, type InventoryTab } from "../components/inventory/TabBar"
@@ -68,8 +65,6 @@ export default function InventoryPage() {
     fetchIngredients,
   } = useInventory()
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [showLogout, setShowLogout] = useState(false)
   const [activeTab, setActiveTab] = useState<InventoryTab>("Ingredients")
 
   // Ingredient state
@@ -77,6 +72,15 @@ export default function InventoryPage() {
   const [editItem, setEditItem] = useState<InventoryItem | null>(null)
   const [deleteItem, setDeleteItem] = useState<InventoryItem | null>(null)
   const [restockItem, setRestockItem] = useState<InventoryItem | null>(null)
+
+  useEffect(() => {
+    const handleOpenInventoryAdd = () => setShowAddItem(true)
+    window.addEventListener("open-inventory-add", handleOpenInventoryAdd)
+
+    return () => {
+      window.removeEventListener("open-inventory-add", handleOpenInventoryAdd)
+    }
+  }, [])
 
   // Supplier state
   const [showAddSupplier, setShowAddSupplier] = useState(false)
@@ -275,12 +279,6 @@ export default function InventoryPage() {
     setDeleteLog(null)
   }
 
-  const handleAddClick = () => {
-    if (activeTab === "Ingredients") setShowAddItem(true)
-    else if (activeTab === "Supplier") setShowAddSupplier(true)
-    else setShowAddLog(true)
-  }
-
   // ── Table Columns ────────────────────────────────────────────────────────
 
   const ingredientColumns = makeIngredientColumns(
@@ -304,22 +302,8 @@ export default function InventoryPage() {
     <div className="page-bg flex h-screen flex-col overflow-hidden text-foreground">
       <Toaster position="top-center" richColors />
 
-      <InventoryHeader
-        activeTab={activeTab}
-        onAddClick={handleAddClick}
-        isLoading={loading}
-        isReadOnly={isReadOnly}
-      />
-
       <div className="page-border flex min-h-0 flex-1 overflow-hidden border-t">
-        <AppSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={() => setShowLogout(true)}
-          activeId="inventory"
-        />
-
-        <main className="page-surface flex-1 overflow-y-auto pb-[72px] md:pb-0">
+        <main className="page-surface flex-1 overflow-y-auto pb-18 md:pb-0">
           <div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
             {/* Page Title */}
             <div className="flex items-start justify-between">
@@ -349,7 +333,6 @@ export default function InventoryPage() {
                 </p>
               </div>
             </div>
-
             {/* Error banner */}
             {error && (
               <div
@@ -397,25 +380,20 @@ export default function InventoryPage() {
                 </button>
               </div>
             )}
-
-            {/* Low Stock Alerts */}
+            Low Stock Alerts
             {activeTab !== "Inventory Log" && (
               <LowStockAlerts items={items} onRestock={setRestockItem} />
             )}
-
             {/* Stats */}
             {activeTab !== "Inventory Log" ? (
               <>
                 <InventoryStats stats={ingredientStats} />
-                <InventoryStats stats={ingredientStats} isMobile />
               </>
             ) : (
               <InventoryStats stats={logStats} />
             )}
-
             {/* Tab Bar */}
             <TabBar active={activeTab} onChange={setActiveTab} />
-
             {/* Content */}
             {loading ? (
               <div className="flex flex-col gap-3">
@@ -466,11 +444,6 @@ export default function InventoryPage() {
           </div>
         </main>
       </div>
-
-      <MobileBottomNav
-        activeId="inventory"
-        onLogout={() => setShowLogout(true)}
-      />
 
       {/* Modals */}
       <AddInventoryModal
@@ -545,16 +518,6 @@ export default function InventoryPage() {
         confirmLabel="Delete"
         cancelLabel="Cancel"
       />
-
-      {showLogout && (
-        <LogoutConfirmationModal
-          isOpen={showLogout}
-          onConfirm={() => {
-            window.location.href = "/login"
-          }}
-          onCancel={() => setShowLogout(false)}
-        />
-      )}
     </div>
   )
 }

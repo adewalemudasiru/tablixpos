@@ -7,11 +7,11 @@ export function AppLogo() {
 
   if (theme === "dark") {
     return (
-      <div className="flex shrink-0 items-center" style={{ height: "33px" }}>
+      <div className="flex h-8.25 shrink-0 items-center">
         <img
           src={logoWhite}
           alt="Tablix Logo"
-          className="h-[33px] w-auto object-contain"
+          className="h-8.25 w-auto object-contain"
         />
       </div>
     )
@@ -19,7 +19,7 @@ export function AppLogo() {
 
   return (
     <div className="flex shrink-0 items-end">
-      <div className="relative size-[33px] shrink-0">
+      <div className="relative size-8.25 shrink-0">
         <svg
           className="absolute block size-full"
           fill="none"
@@ -29,7 +29,7 @@ export function AppLogo() {
           <path d={svgPaths.p30add40} fill="#E91835" />
         </svg>
       </div>
-      <div className="relative h-[33.346px] w-[108px] shrink-0">
+      <div className="relative h-8.25 w-27 shrink-0">
         <svg
           className="absolute block size-full"
           fill="none"

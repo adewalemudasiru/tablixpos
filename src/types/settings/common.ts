@@ -1,8 +1,9 @@
 export type SettingsTab =
   | "Business Info"
-  | "Account Settings"
+  | "Profile"
   | "Loyalty Reward"
   | "POS & Printer"
+  | "Printer Test"
   | "Kitchen Order"
   | "Table Management"
   | "Tax Settings"

@@ -1,6 +1,4 @@
 import { useState } from "react"
-import { LogoutConfirmationModal } from "../components/LogoutConfirmationModal"
-import { AppSidebar, MobileBottomNav } from "../components/AppSidebar"
 import { ConfirmModal } from "../components/ds/Modal"
 import { colors, font } from "../components/ds/tokens"
 import { MenuModal } from "@/components/menu/MenuModal"
@@ -10,13 +8,10 @@ import { CategoryTable } from "@/components/menu/CategoryTable"
 import { Pagination } from "@/components/menu/Pagination"
 
 // New components
-import { MenuHeader } from "@/components/menu/MenuHeader"
-import { MenuPageHeader } from "@/components/menu/MenuPageHeader"
 import { MenuTabs } from "@/components/menu/MenuTabs"
 import { MenuToolbar } from "@/components/menu/MenuToolbar"
 import { MenuLoadingState } from "@/components/menu/MenuLoadingState"
 import { MenuErrorState } from "@/components/menu/MenuErrorState"
-import { MobileMenuHeader } from "@/components/menu/MobileMenuHeader"
 import { MobileMenuList } from "@/components/menu/MobileMenuList"
 import { MobileCategoryList } from "@/components/menu/MobileCategoryList"
 import { MenuItemDetailSheet } from "@/components/menu/MenuItemDetailSheet"
@@ -50,8 +45,6 @@ export default function MenuPage() {
     deleteCategory,
   } = useMenuOperations(loadData)
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [showLogout, setShowLogout] = useState(false)
   const [activeTab, setActiveTab] = useState<ActiveTab>("Menu Item")
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -243,36 +236,10 @@ export default function MenuPage() {
 
   return (
     <div className="page-bg flex h-screen flex-col overflow-hidden text-foreground">
-      <MenuHeader />
       {/* Body */}
       <div className="page-border flex min-h-0 flex-1 overflow-hidden border-t">
-        <AppSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={() => setShowLogout(true)}
-          activeId="menu"
-        />
-
         {/* ── MOBILE layout ── */}
         <div className="page-surface flex flex-1 flex-col overflow-hidden md:hidden">
-          <MobileMenuHeader
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            search={search}
-            onSearchChange={(v) => {
-              setSearch(v)
-              setPage(1)
-            }}
-            onAddClick={() => {
-              if (activeTab === "Menu Item") {
-                setEditItem(null)
-                setShowModal(true)
-              } else {
-                openCategoryModal()
-              }
-            }}
-          />
-
           <div className="flex-1 overflow-y-auto pb-[80px]">
             <div className="px-4 py-2">
               <p
@@ -313,8 +280,6 @@ export default function MenuPage() {
         {/* ── DESKTOP layout ── */}
         <main className="page-surface hidden flex-1 overflow-y-auto pb-0 md:block">
           <div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
-            <MenuPageHeader />
-
             {loading && <MenuLoadingState />}
 
             {!loading && apiError && (
@@ -500,13 +465,6 @@ export default function MenuPage() {
         onSave={handleSaveCategory}
         editCategory={editCategory}
       />
-      {showLogout && (
-        <LogoutConfirmationModal
-          isOpen={showLogout}
-          onCancel={() => setShowLogout(false)}
-        />
-      )}
-      <MobileBottomNav activeId="menu" onLogout={() => setShowLogout(true)} />
       {/* Sheets */}
       <MenuItemDetailSheet
         item={sheetItem}

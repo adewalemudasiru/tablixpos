@@ -34,10 +34,10 @@ export const DashboardBottomNav: React.FC<DashboardBottomNavProps> = ({
 
   return (
     <div
-      className={`flex h-[84px] shrink-0 items-center justify-between border-t px-6 ${
+      className={`flex h-21 shrink-0 items-center justify-between border-t px-6 ${
         theme === "dark"
           ? "border-[#3c3c3e] bg-[#2c2c2e]"
-          : "border-[var(--page-border)] bg-[var(--page-surface)]"
+          : "border-(--page-border) bg-(--page-surface)"
       }`}
     >
       <div

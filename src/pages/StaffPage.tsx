@@ -1,7 +1,5 @@
 import { useState } from "react"
 import { useAppStore } from "../store/AppContext"
-import { LogoutConfirmationModal } from "../components/LogoutConfirmationModal"
-import { AppSidebar, MobileBottomNav } from "../components/AppSidebar"
 import { Toaster } from "sonner"
 import { ConfirmModal } from "../components/ds/Modal"
 import { ResetPinModal } from "@/components/staff-page/ResetPinModal"
@@ -10,7 +8,6 @@ import { RolesManagementTab } from "@/components/staff-page/RolesManagementTab"
 import { ActivityLog } from "@/components/staff-page/ActivityLog"
 
 // Import new components
-import { StaffHeader } from "../components/staff-page/StaffHeader"
 import { StaffTabs } from "../components/staff-page/StaffTabs"
 import { StaffTable } from "../components/staff-page/StaffTable"
 import { StaffMobileSearch } from "../components/staff-page/StaffMobileSearch"
@@ -25,8 +22,6 @@ const PAGE_SIZE = 10
 
 export default function StaffPage() {
   const { isReadOnly, roles, kotEnabled } = useAppStore()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [showLogout, setShowLogout] = useState(false)
   const [activeTab, setActiveTab] = useState<StaffTab>("Team")
   const [showModal, setShowModal] = useState(false)
   const [editStaff, setEditStaff] = useState<Staff | null>(null)
@@ -72,16 +67,7 @@ export default function StaffPage() {
   return (
     <div className="page-bg flex h-screen flex-col overflow-hidden text-foreground">
       <Toaster position="top-center" richColors />
-      <StaffHeader />
-
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <AppSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={() => setShowLogout(true)}
-          activeId="staff"
-        />
-
         {/* MOBILE layout */}
         <div className="page-surface-2 flex flex-1 flex-col overflow-hidden md:hidden">
           <StaffMobileSearch
@@ -184,8 +170,6 @@ export default function StaffPage() {
         </main>
       </div>
 
-      <MobileBottomNav activeId="staff" onLogout={() => setShowLogout(true)} />
-
       <StaffDetailSheet
         staff={sheetStaff}
         roles={roles}
@@ -230,12 +214,6 @@ export default function StaffPage() {
         variant="danger"
         confirmLabel="Yes, Delete"
         cancelLabel="Cancel"
-      />
-
-      <LogoutConfirmationModal
-        isOpen={showLogout}
-        onCancel={() => setShowLogout(false)}
-        onConfirm={() => setShowLogout(false)}
       />
     </div>
   )

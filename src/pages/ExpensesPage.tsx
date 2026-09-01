@@ -1,13 +1,10 @@
-import { useState } from "react"
-import { LogoutConfirmationModal } from "../components/LogoutConfirmationModal"
-import { AppSidebar, MobileBottomNav } from "../components/AppSidebar"
+import { useEffect, useState } from "react"
 import { ConfirmModal } from "../components/ds/Modal"
 import { Toaster } from "sonner"
 import { useAppStore, type Expense } from "../store/AppContext"
 
 // New components
 import { Button } from "../components/ds/Button"
-import { ExpensesHeader } from "../components/expenses/ExpensesHeader"
 import { ExpensesTable } from "../components/expenses/ExpensesTable"
 import { MobileExpenseCard } from "../components/expenses/MobileExpenseCard"
 import { ExpenseStats } from "../components/expenses/ExpenseStats"
@@ -43,11 +40,18 @@ export default function ExpensesPage() {
     toEditForm,
   } = useExpenses()
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [showLogout, setShowLogout] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [editExpense, setEditExpense] = useState<Expense | null>(null)
   const [deleteExp, setDeleteExp] = useState<Expense | null>(null)
+
+  useEffect(() => {
+    const handleOpenExpenseAdd = () => setShowAddModal(true)
+    window.addEventListener("open-expense-add", handleOpenExpenseAdd)
+
+    return () => {
+      window.removeEventListener("open-expense-add", handleOpenExpenseAdd)
+    }
+  }, [])
 
   const STAT_CARDS = [
     {
@@ -258,21 +262,8 @@ export default function ExpensesPage() {
     <div className="page-bg flex h-screen flex-col overflow-hidden text-foreground">
       <Toaster position="top-center" richColors />
 
-      <ExpensesHeader
-        onAddClick={() => setShowAddModal(true)}
-        isReadOnly={isReadOnly}
-        isLoading={loading}
-      />
-
       <div className="page-border flex min-h-0 flex-1 overflow-hidden border-t">
-        <AppSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={() => setShowLogout(true)}
-          activeId="expenses"
-        />
-
-        <main className="page-surface flex-1 overflow-y-auto pb-[72px] md:pb-0">
+        <main className="page-surface flex-1 overflow-y-auto pb-18 md:pb-0">
           <div className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
             {/* Heading */}
             <div className="flex items-start justify-between">
@@ -312,11 +303,6 @@ export default function ExpensesPage() {
         </main>
       </div>
 
-      <MobileBottomNav
-        activeId="expenses"
-        onLogout={() => setShowLogout(true)}
-      />
-
       {/* Modals */}
       <ExpenseFormModal
         open={showAddModal || !!editExpense}
@@ -340,12 +326,6 @@ export default function ExpensesPage() {
         }
         confirmLabel="Delete"
         variant="danger"
-      />
-
-      <LogoutConfirmationModal
-        isOpen={showLogout}
-        onConfirm={() => setShowLogout(false)}
-        onCancel={() => setShowLogout(false)}
       />
     </div>
   )

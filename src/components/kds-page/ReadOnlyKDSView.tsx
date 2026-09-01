@@ -30,7 +30,7 @@ export function ReadOnlyKDSView({
       style={{ background: isDark ? "#1c1c1e" : "var(--page-bg)" }}
     >
       <KDSHeader theme={theme} isDark={isDark} />
-
+      whale
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <AppSidebar
           open={sidebarOpen}
@@ -44,9 +44,7 @@ export function ReadOnlyKDSView({
           features={["Subscribe to Premium to restore full functionality"]}
         />
       </div>
-
       <MobileBottomNav activeId="kds" onLogout={onLogout} />
-
       <LogoutConfirmationModal
         isOpen={showLogout}
         onConfirm={onLogoutConfirm}

@@ -1,33 +1,34 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router";
-import { AuthLayout } from "../components/AuthLayout";
-import { TablixLogo } from "../components/TablixLogo";
+import React, { useState } from "react"
+import { useNavigate } from "react-router"
+import { AuthLayout } from "../components/AuthLayout"
+import { TablixLogo } from "../components/TablixLogo"
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [form, setForm] = useState({
     businessName: "",
     ownerName: "",
     email: "",
     phone: "",
-  });
+  })
 
-  const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-  };
+  const handleChange =
+    (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.value }))
+    }
 
   const isComplete =
     form.businessName.trim() &&
     form.ownerName.trim() &&
     form.email.trim() &&
-    form.phone.trim();
+    form.phone.trim()
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (isComplete) {
-      navigate("/otp");
+      navigate("/otp")
     }
-  };
+  }
 
   const fields = [
     {
@@ -52,40 +53,43 @@ export default function RegisterPage() {
       placeholder: "eg, +234 900 00 1020",
       type: "tel",
     },
-  ];
+  ]
 
   return (
     <AuthLayout>
-      <div className="bg-[var(--page-card-bg)] rounded-[10px] p-5 flex flex-col gap-6 items-center w-full shadow-sm border border-[var(--page-border)]">
+      <div className="flex w-full flex-col items-center gap-6 rounded-[10px] border border-[var(--page-border)] bg-[var(--page-card-bg)] p-5 shadow-sm">
         {/* Logo */}
         <TablixLogo />
 
         {/* Header */}
         <div className="flex flex-col items-center gap-[6px] text-center">
-          <p className="font-semibold text-[20px] text-[var(--page-text)] leading-normal">
+          <p className="text-[20px] leading-normal font-semibold text-[var(--page-text)]">
             Let's Create Your Account
           </p>
-          <p className="font-normal text-[14px] text-[var(--page-text-secondary)] leading-[22px]">
+          <p className="text-[14px] leading-[22px] font-normal text-[var(--page-text-secondary)]">
             Signing up for tablix is fast and free
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
-          <div className="flex flex-col gap-4 w-full">
+        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6">
+          <div className="flex w-full flex-col gap-4">
             {fields.map((field) => (
-              <div key={field.key} className="flex flex-col gap-[6px] items-start w-full">
-                <label className="font-medium text-[14px] text-[var(--page-text)] leading-[20px]">
+              <div
+                key={field.key}
+                className="flex w-full flex-col items-start gap-[6px]"
+              >
+                <label className="text-[14px] leading-[20px] font-medium text-[var(--page-text)]">
                   {field.label}
                   <span className="text-[#f04438]">*</span>
                 </label>
-                <div className="bg-[var(--page-bg)] rounded-[8px] w-full border border-[var(--page-border)] shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] focus-within:border-[#e91835] focus-within:ring-2 focus-within:ring-[#e91835]/20 transition-all">
+                <div className="w-full rounded-[8px] border border-[var(--page-border)] bg-[var(--page-bg)] shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] transition-all focus-within:border-[#e91835] focus-within:ring-2 focus-within:ring-[#e91835]/20">
                   <input
                     type={field.type || "text"}
                     placeholder={field.placeholder}
                     value={form[field.key]}
                     onChange={handleChange(field.key)}
-                    className="w-full px-[14px] py-[10px] text-[16px] text-[var(--page-text)] placeholder:text-[var(--c-text-placeholder)] bg-transparent outline-none rounded-[8px]"
+                    className="w-full rounded-[8px] bg-transparent px-[14px] py-[10px] text-[16px] text-[var(--page-text)] outline-none placeholder:text-[var(--c-text-placeholder)]"
                   />
                 </div>
               </div>
@@ -95,10 +99,10 @@ export default function RegisterPage() {
           {/* Create Account Button */}
           <button
             type="submit"
-            className={`w-full rounded-[8px] border border-transparent shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] px-[20px] py-[12px] font-medium text-[16px] leading-[22px] transition-all ${
+            className={`w-full rounded-[8px] border border-transparent px-[20px] py-[12px] text-[16px] leading-[22px] font-medium shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05)] transition-all ${
               isComplete
-                ? "bg-[#e91835] text-white hover:bg-[#d01530] active:bg-[#b81229] cursor-pointer"
-                : "bg-[#e91835]/20 text-white/30 cursor-not-allowed"
+                ? "cursor-pointer bg-[#e91835] text-white hover:bg-[#d01530] active:bg-[#b81229]"
+                : "cursor-not-allowed bg-[#e91835]/20 text-white/30"
             }`}
           >
             Create Account
@@ -106,11 +110,11 @@ export default function RegisterPage() {
         </form>
 
         {/* Sign in link */}
-        <p className="text-[14px] text-[var(--page-text-secondary)] leading-[22px]">
+        <p className="text-[14px] leading-[22px] text-[var(--page-text-secondary)]">
           Already have a Tablix account?{" "}
           <button
             onClick={() => navigate("/")}
-            className="font-bold text-[#e91835] underline hover:text-[#d01530] transition-colors"
+            className="font-bold text-[#e91835] underline transition-colors hover:text-[#d01530]"
           >
             Sign in
           </button>
@@ -118,14 +122,18 @@ export default function RegisterPage() {
         </p>
 
         {/* reCAPTCHA notice */}
-        <p className="text-[14px] text-[var(--page-text-secondary)] leading-[22px] text-center">
+        <p className="text-center text-[14px] leading-[22px] text-[var(--page-text-secondary)]">
           This site is protected by reCAPTCHA Enterprise and the Google{" "}
-          <span className="text-[#e91835] underline cursor-pointer">Privacy Policy</span>
+          <span className="cursor-pointer text-[#e91835] underline">
+            Privacy Policy
+          </span>
           {" and "}
-          <span className="text-[#e91835] underline cursor-pointer">Terms of Service</span>
+          <span className="cursor-pointer text-[#e91835] underline">
+            Terms of Service
+          </span>
           {" apply."}
         </p>
       </div>
     </AuthLayout>
-  );
+  )
 }
